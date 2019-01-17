@@ -1,0 +1,83 @@
+<div class="contents-width mx-auto px-3 py-5">
+    <div class="mb-4">
+        <h2 class="text-large mb-4 text-center"><strong>購入情報確認</strong></h2>
+        <p class="mb-4">購入情報をご確認ください。</p>
+
+        <div *ngFor="let authorizeSeatReservation of (purchase | async).authorizeSeatReservations" class="mb-4 px-3 bg-light-gray">
+            <div class="py-3 border-bottom border-gray">
+                <div class="row">
+                    <p class="mb-2 mb-md-0 col-md-4">
+                        <i class="fas fa-map-marker-alt mr-2"></i>劇場 / スクリーン</p>
+                    <p class="col-md-8">{{ authorizeSeatReservation.object.event.superEvent.location.name.ja }} / {{
+                        authorizeSeatReservation.object.event.location.name.ja }}</p>
+                </div>
+            </div>
+            <div class="py-3 border-bottom border-gray">
+                <div class="row">
+                    <p class="mb-2 mb-md-0 col-md-4">
+                        <i class="fas fa-film mr-2"></i>作品</p>
+                    <p class="col-md-8">{{ authorizeSeatReservation.object.event.superEvent.name.ja }}</p>
+                </div>
+            </div>
+            <div class="py-3 border-bottom border-gray">
+                <div class="row">
+                    <p class="mb-2 mb-md-0 col-md-4">
+                        <i class="far fa-clock mr-2"></i>上映日時</p>
+                    <p class="col-md-8">{{
+                        moment(authorizeSeatReservation.object.event.superEvent.startDate).format('YYYY/MM/DD (ddd)
+                        HH:mm') }}</p>
+                </div>
+            </div>
+            <div class="py-3">
+                <div class="row">
+                    <p class="mb-2 mb-md-0 col-md-4">
+                        <i class="fas fa-ticket-alt mr-2"></i>座席・券種</p>
+                    <div class="col-md-8">
+                        <div *ngFor="let acceptedOffer of authorizeSeatReservation.object.acceptedOffer" class="mb-2">
+                            <p>{{ acceptedOffer.ticketedSeat.seatNumber }}</p>
+                            <p>{{ acceptedOffer.name.ja }} / {{
+                                getTicketPrice(acceptedOffer).single | currency : 'JPY' }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-4 px-3 bg-light-gray">
+            <div class="py-3 border-bottom border-gray">
+                <div class="row">
+                    <p class="mb-2 mb-md-0 col-md-4">
+                        <i class="fas fa-user-circle mr-2"></i>お名前</p>
+                    <p class="col-md-8">{{ (purchase | async).customerContact.familyName }} {{ (purchase |
+                        async).customerContact.givenName }}</p>
+                </div>
+            </div>
+            <div class="py-3 border-bottom border-gray">
+                <div class="row">
+                    <p class="mb-2 mb-md-0 col-md-4">
+                        <i class="far fa-envelope mr-2"></i>メールアドレス</p>
+                    <p class="col-md-8">{{ (purchase | async).customerContact.email }}</p>
+                </div>
+            </div>
+            <div class="py-3 border-bottom border-gray">
+                <div class="row">
+                    <p class="mb-2 mb-md-0 col-md-4">
+                        <i class="fas fa-phone mr-2"></i>電話番号</p>
+                    <p class="col-md-8">{{ (purchase | async).customerContact.telephone | libphonenumberFormat }}</p>
+                </div>
+            </div>
+            <div class="py-3" *ngIf="amount > 0">
+                <div class="row">
+                    <p class="mb-2 mb-md-0 col-md-4">
+                        <i class="far fa-credit-card mr-2"></i>決済方法</p>
+                    <p class="col-md-8">クレジットカード</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="buttons mx-auto px-3">
+        <button type="button" class="btn btn-primary btn-block py-3 mb-3" [disabled]="isLoading | async" (click)="onSubmit()">購入確定</button>
+        <button type="button" class="btn btn-outline-primary btn-block py-3" routerLink="/purchase/input">購入者情報入力へ戻る</button>
+    </div>
+</div>

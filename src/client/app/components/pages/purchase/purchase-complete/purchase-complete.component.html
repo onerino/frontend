@@ -1,0 +1,93 @@
+<div class="contents-width mx-auto px-3 py-5">
+    <div class="mb-4">
+        <h2 class="text-large mb-4 text-center"><strong>購入完了</strong></h2>
+        <p class="mb-4">ご購入ありがとうございます。</p>
+
+        <div class="mb-4 px-3 bg-light-gray">
+            <div class="py-3">
+                <div class="row align-items-center">
+                    <p class="mb-2 mb-md-0 col-md-4">
+                        <i class="fas fa-key mr-2"></i>購入番号</p>
+                    <p class="col-md-8 text-x-large text-info">
+                        <strong>{{ (purchase | async).order.confirmationNumber }}</strong>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div *ngFor="let eventOrder of eventOrders" class="mb-4 px-3 bg-light-gray">
+            <div class="py-3 border-bottom border-gray">
+                <div class="row">
+                    <p class="mb-2 mb-md-0 col-md-4">
+                        <i class="fas fa-map-marker-alt mr-2"></i>劇場 / スクリーン</p>
+                    <p class="col-md-8">{{ eventOrder.event.superEvent.location.name.ja }} / {{
+                        eventOrder.event.location.name.ja }}</p>
+                </div>
+            </div>
+            <div class="py-3 border-bottom border-gray">
+                <div class="row">
+                    <p class="mb-2 mb-md-0 col-md-4">
+                        <i class="fas fa-film mr-2"></i>作品</p>
+                    <p class="col-md-8">{{ eventOrder.event.name.ja }}</p>
+                </div>
+            </div>
+            <div class="py-3 border-bottom border-gray">
+                <div class="row">
+                    <p class="mb-2 mb-md-0 col-md-4">
+                        <i class="far fa-clock mr-2"></i>上映日時</p>
+                    <p class="col-md-8">{{ moment(eventOrder.event.startDate).format('YYYY/MM/DD (ddd)
+                        HH:mm') }}</p>
+                </div>
+            </div>
+            <div class="py-3">
+                <div class="row">
+                    <p class="mb-2 mb-md-0 col-md-4">
+                        <i class="fas fa-ticket-alt mr-2"></i>座席・券種</p>
+                    <div class="col-md-8">
+                        <div *ngFor="let acceptedOffer of eventOrder.data" class="mb-2">
+                            <p>{{ acceptedOffer.itemOffered.reservedTicket.ticketedSeat.seatNumber }}</p>
+                            <p>{{ acceptedOffer.itemOffered.reservedTicket.ticketType.name.ja }} / {{
+                                getTicketPrice(acceptedOffer).single | currency : 'JPY' }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-4 px-3 bg-light-gray">
+            <div class="py-3 border-bottom border-gray">
+                <div class="row">
+                    <p class="mb-2 mb-md-0 col-md-4">
+                        <i class="fas fa-user-circle mr-2"></i>お名前</p>
+                    <p class="col-md-8">{{ (purchase | async).order.customer.familyName }} {{ (purchase |
+                        async).order.customer.givenName }}</p>
+                </div>
+            </div>
+            <div class="py-3 border-bottom border-gray">
+                <div class="row">
+                    <p class="mb-2 mb-md-0 col-md-4">
+                        <i class="far fa-envelope mr-2"></i>メールアドレス</p>
+                    <p class="col-md-8">{{ (purchase | async).order.customer.email }}</p>
+                </div>
+            </div>
+            <div class="py-3 border-bottom border-gray">
+                <div class="row">
+                    <p class="mb-2 mb-md-0 col-md-4">
+                        <i class="fas fa-phone mr-2"></i>電話番号</p>
+                    <p class="col-md-8">{{ (purchase | async).order.customer.telephone | libphonenumberFormat }}</p>
+                </div>
+            </div>
+            <div class="py-3" *ngIf="(purchase | async).order.price > 0">
+                <div class="row">
+                    <p class="mb-2 mb-md-0 col-md-4">
+                        <i class="far fa-credit-card mr-2"></i>決済方法</p>
+                    <p class="col-md-8">クレジットカード</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="buttons mx-auto px-3">
+        <button type="button" class="btn btn-outline-primary btn-block py-3" routerLink="/">TOPへ戻る</button>
+    </div>
+
+</div>
