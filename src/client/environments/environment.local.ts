@@ -6,7 +6,7 @@ export const environment = {
 
     APP_PREFIX: 'OY',
     PROJECT_ID: 'oyatsu',
-    ENV: 'development',
+    ENV: 'local',
 
     API_ENDPOINT: 'https://oyatsu-cinerino-api-dev.appspot.com',
 
@@ -17,9 +17,5 @@ export const environment = {
     ANALYTICS_ID: '',
 
     TRANSACTION_TIME: '30',
-    PRE_SCHEDULE_DATE: '3',
-
-    CLIENT_ID: '',
-    CLIENT_ID_OAUTH2: ''
-
+    PRE_SCHEDULE_DATE: '3'
 };
