@@ -12,7 +12,7 @@ import {
     formatTelephone
 } from '../../functions';
 import { IScreen } from '../../models';
-import { CinerinoService } from '../../services/cinerino.service';
+import { CinerinoService } from '../../services';
 import * as purchase from '../actions/purchase.action';
 
 /**
@@ -26,58 +26,6 @@ export class PurchaseEffects {
         private cinerino: CinerinoService,
         private http: HttpClient
     ) { }
-
-    /**
-     * GetTheaters
-     */
-    @Effect()
-    public getTheaters = this.actions.pipe(
-        ofType<purchase.GetTheaters>(purchase.ActionTypes.GetTheaters),
-        map(action => action.payload),
-        mergeMap(async (payload) => {
-            try {
-                await this.cinerino.getServices();
-                const searchMovieTheatersResult = await this.cinerino.organization.searchMovieTheaters(payload.params);
-                const movieTheaters = searchMovieTheatersResult.data;
-                return new purchase.GetTheatersSuccess({ movieTheaters });
-            } catch (error) {
-                return new purchase.GetTheatersFail({ error: error });
-            }
-        })
-    );
-
-    /**
-     * GetSchedule
-     */
-    @Effect()
-    public getSchedule = this.actions.pipe(
-        ofType<purchase.GetSchedule>(purchase.ActionTypes.GetSchedule),
-        map(action => action.payload),
-        mergeMap(async (payload) => {
-            try {
-                await this.cinerino.getServices();
-                const branchCode = payload.movieTheater.location.branchCode;
-                const scheduleDate = payload.scheduleDate;
-                const today = moment(moment().format('YYYY-MM-DD')).toDate();
-                const screeningEventsResult = await this.cinerino.event.searchScreeningEvents({
-                    typeOf: factory.chevre.eventType.ScreeningEvent,
-                    eventStatuses: [factory.chevre.eventStatusType.EventScheduled],
-                    superEvent: { locationBranchCodes: [branchCode] },
-                    startFrom: moment(scheduleDate).toDate(),
-                    startThrough: moment(scheduleDate).add(1, 'day').toDate(),
-                    offers: {
-                        availableFrom: today,
-                        availableThrough: today
-                    }
-                });
-                const screeningEvents = screeningEventsResult.data;
-
-                return new purchase.GetScheduleSuccess({ screeningEvents, scheduleDate });
-            } catch (error) {
-                return new purchase.GetScheduleFail({ error: error });
-            }
-        })
-    );
 
     /**
      * GetPreScheduleDates
@@ -133,10 +81,8 @@ export class PurchaseEffects {
                 const params = payload.params;
                 const selleId = params.seller.id;
                 await this.cinerino.getServices();
-                if (environment.WAITER_SERVER_URL !== '') {
-                    const passport = await this.cinerino.getPassport(selleId);
-                    params.object = { passport };
-                }
+                const passport = await this.cinerino.getPassport(selleId);
+                params.object = { passport };
                 const transaction = await this.cinerino.transaction.placeOrder.start(params);
                 return new purchase.StartTransactionSuccess({ transaction });
             } catch (error) {
@@ -200,8 +146,7 @@ export class PurchaseEffects {
                                 ticketedSeat: reservation.seat,
                                 additionalProperty: [] // ここにムビチケ情報を入れる
                             };
-                        }),
-                        notes: ''
+                        })
                     },
                     purpose: transaction
                 });

@@ -9,9 +9,7 @@ import { IMovieTicket, IReservationTicket, IScreen, Reservation } from '../../mo
 import { Actions, ActionTypes } from '../actions/purchase.action';
 
 export interface IPurchaseState {
-    movieTheaters: factory.organization.IOrganization<factory.organizationType.MovieTheater>[];
     movieTheater?: factory.organization.IOrganization<factory.organizationType.MovieTheater>;
-    screeningEvents: factory.chevre.event.screeningEvent.IEvent[];
     screeningEvent?: factory.chevre.event.screeningEvent.IEvent;
     scheduleDate?: string;
     preScheduleDates: string[];
@@ -34,6 +32,19 @@ export interface IPurchaseState {
     pendingMovieTickets: IMovieTicket[];
 }
 
+export const purchaseInitialState: IPurchaseState = {
+        preScheduleDates: [],
+        screeningEventOffers: [],
+        reservations: [],
+        screeningEventTicketOffers: [],
+        orderCount: 0,
+        authorizeSeatReservations: [],
+        checkMovieTicketActions: [],
+        authorizeCreditCardPayments: [],
+        authorizeMovieTicketPayments: [],
+        isUsedMovieTicket: false,
+        pendingMovieTickets: []
+};
 
 /**
  * Reducer
@@ -44,8 +55,6 @@ export function reducer(state: IState, action: Actions): IState {
     switch (action.type) {
         case ActionTypes.Delete: {
             state.purchase = {
-                movieTheaters: [],
-                screeningEvents: [],
                 preScheduleDates: [],
                 screeningEventOffers: [],
                 reservations: [],
@@ -62,47 +71,28 @@ export function reducer(state: IState, action: Actions): IState {
         }
         case ActionTypes.UnsettledDelete: {
             state.purchase.reservations = [];
+            state.purchase.screeningEvent = undefined;
             state.purchase.screeningEventTicketOffers = [];
             state.purchase.authorizeSeatReservation = undefined;
             state.purchase.checkMovieTicketAction = undefined;
             state.purchase.isUsedMovieTicket = false;
             return { ...state };
         }
-        case ActionTypes.GetTheaters: {
-            return { ...state, loading: true, process: '劇場情報を取得しています', };
-        }
-        case ActionTypes.GetTheatersSuccess: {
-            const movieTheaters = action.payload.movieTheaters;
-            return { ...state, loading: false, process: '', error: null, purchase: { ...state.purchase, movieTheaters } };
-        }
-        case ActionTypes.GetTheatersFail: {
-            const error = action.payload.error;
-            return { ...state, loading: false, process: '', error: JSON.stringify(error) };
-        }
         case ActionTypes.SelectTheater: {
             state.purchase.movieTheater = action.payload.movieTheater;
             return { ...state, loading: false, process: '', error: null };
         }
-        case ActionTypes.GetSchedule: {
-            return { ...state, loading: true, process: 'スケジュールを取得しています', };
-        }
-        case ActionTypes.GetScheduleSuccess: {
-            const screeningEvents = action.payload.screeningEvents;
+        case ActionTypes.SelectScheduleDate: {
             const scheduleDate = action.payload.scheduleDate;
-            state.purchase.screeningEvents = screeningEvents;
             state.purchase.scheduleDate = scheduleDate;
-
-            return { ...state, loading: false, process: '', error: null };
-        }
-        case ActionTypes.GetScheduleFail: {
-            const error = action.payload.error;
-            return { ...state, loading: false, process: '', error: JSON.stringify(error) };
+            return { ...state, loading: true, process: '', error: null };
         }
         case ActionTypes.GetPreScheduleDates: {
             return { ...state, loading: true, process: '先行スケジュールを取得しています', };
         }
         case ActionTypes.GetPreScheduleDatesSuccess: {
-            state.purchase.preScheduleDates = action.payload.sheduleDates;
+            const preScheduleDates = action.payload.sheduleDates;
+            state.purchase.preScheduleDates = preScheduleDates;
             return { ...state, loading: false, process: '', error: null };
         }
         case ActionTypes.GetPreScheduleDatesFail: {
@@ -123,9 +113,7 @@ export function reducer(state: IState, action: Actions): IState {
         }
         case ActionTypes.StartTransactionSuccess: {
             state.purchase.transaction = action.payload.transaction;
-            state.purchase.screeningEvents = [];
             state.purchase.preScheduleDates = [];
-            state.purchase.movieTheaters = [];
             return { ...state, loading: false, process: '', error: null };
         }
         case ActionTypes.StartTransactionFail: {
@@ -239,10 +227,12 @@ export function reducer(state: IState, action: Actions): IState {
                         id: authorizeSeatReservation.id,
                         movieTickets: movieTicketReservations.map((r) => {
                             const pendingReservation = pendingReservations.find((p) => {
-                                return (p.reservedTicket.ticketedSeat.seatNumber === r.seat.seatNumber
+                                return (p.reservedTicket.ticketedSeat !== undefined
+                                    && p.reservedTicket.ticketedSeat.seatNumber === r.seat.seatNumber
                                     && p.reservedTicket.ticketedSeat.seatSection === r.seat.seatSection);
                             });
-                            if (pendingReservation === undefined) {
+                            if (pendingReservation === undefined
+                                || pendingReservation.reservedTicket.ticketedSeat === undefined) {
                                 throw new Error('pendingReservation is undefined');
                             }
                             const movieTicket =
@@ -376,8 +366,6 @@ export function reducer(state: IState, action: Actions): IState {
         case ActionTypes.ReserveSuccess: {
             const order = action.payload.order;
             state.purchase = {
-                movieTheaters: [],
-                screeningEvents: [],
                 preScheduleDates: [],
                 screeningEventOffers: [],
                 reservations: [],
