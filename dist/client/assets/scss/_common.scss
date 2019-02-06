@@ -72,12 +72,22 @@ button {
 }
 
 .contents-width {
-    max-width: 960px;
+    max-width: 1024px;
 }
 
 .select-text {
     -webkit-touch-callout: default;
     user-select: all;
+}
+
+.scroll-vertical {
+    -webkit-overflow-scrolling: touch;
+    overflow-y: auto;
+}
+
+.scroll-horizontal {
+    -webkit-overflow-scrolling: touch;
+    overflow-x: auto;
 }
 
 .text-x-small {
