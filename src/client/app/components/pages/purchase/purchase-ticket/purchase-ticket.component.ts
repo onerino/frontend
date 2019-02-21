@@ -4,16 +4,17 @@ import { factory } from '@cinerino/api-javascript-client';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Actions, ofType } from '@ngrx/effects';
 import { select, Store } from '@ngrx/store';
+import { TranslateService } from '@ngx-translate/core';
 import { Observable, race } from 'rxjs';
 import { take, tap } from 'rxjs/operators';
 import { IReservationTicket, Reservation } from '../../../../models/purchase/reservation';
+import { UtilService } from '../../../../services';
 import {
     ActionTypes,
     SelectTickets,
     TemporaryReservation
 } from '../../../../store/actions/purchase.action';
 import * as reducers from '../../../../store/reducers';
-import { AlertModalComponent } from '../../../parts/alert-modal/alert-modal.component';
 import { MvtkCheckModalComponent } from '../../../parts/mvtk-check-modal/mvtk-check-modal.component';
 import { TicketListModalComponent } from '../../../parts/ticket-list-modal/ticket-list-modal.component';
 
@@ -29,7 +30,9 @@ export class PurchaseTicketComponent implements OnInit {
         private store: Store<reducers.IState>,
         private actions: Actions,
         private router: Router,
-        private modal: NgbModal
+        private modal: NgbModal,
+        private util: UtilService,
+        private translate: TranslateService
     ) { }
 
     public ngOnInit() {
@@ -53,9 +56,9 @@ export class PurchaseTicketComponent implements OnInit {
                 return (reservation.ticket === undefined);
             });
             if (unselectedReservations.length > 0) {
-                this.openAlert({
-                    title: 'エラー',
-                    body: '券種が未選択です。'
+                this.util.openAlert({
+                    title: this.translate.instant('common.error'),
+                    body: this.translate.instant('purchase.ticket.alert.unselected')
                 });
                 return;
             }
@@ -77,9 +80,9 @@ export class PurchaseTicketComponent implements OnInit {
                 return (filterResult.length % value !== 0);
             });
             if (validResult.length > 0) {
-                this.openAlert({
-                    title: 'エラー',
-                    body: '割引券の適用条件を再度ご確認ください。'
+                this.util.openAlert({
+                    title: this.translate.instant('common.error'),
+                    body: this.translate.instant('purchase.ticket.alert.ticketCondition')
                 });
                 return;
             }
@@ -136,17 +139,5 @@ export class PurchaseTicketComponent implements OnInit {
             centered: true
         });
     }
-
-    public openAlert(args: {
-        title: string;
-        body: string;
-    }) {
-        const modalRef = this.modal.open(AlertModalComponent, {
-            centered: true
-        });
-        modalRef.componentInstance.title = args.title;
-        modalRef.componentInstance.body = args.body;
-    }
-
 
 }

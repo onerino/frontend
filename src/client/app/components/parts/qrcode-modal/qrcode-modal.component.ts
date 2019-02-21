@@ -22,6 +22,9 @@ export class QrCodeModalComponent implements OnInit {
     public ngOnInit() {
         this.urlList = [];
         this.order.acceptedOffers.forEach((acceptedOffer) => {
+            if (acceptedOffer.itemOffered.typeOf !== factory.chevre.reservationType.EventReservation) {
+                return;
+            }
             const ticketToken = <string>acceptedOffer.itemOffered.reservedTicket.ticketToken;
             const basicSize = 21;
             const option: qrcode.QRCodeToDataURLOptions = {

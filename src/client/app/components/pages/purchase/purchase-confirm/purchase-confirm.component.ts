@@ -1,15 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Actions, ofType } from '@ngrx/effects';
 import { select, Store } from '@ngrx/store';
+import { TranslateService } from '@ngx-translate/core';
 import * as moment from 'moment';
 import { Observable, race } from 'rxjs';
 import { take, tap } from 'rxjs/operators';
 import { getAmount, getTicketPrice } from '../../../../functions';
+import { UtilService } from '../../../../services';
 import { ActionTypes, AuthorizeCreditCard, AuthorizeMovieTicket, Reserve } from '../../../../store/actions/purchase.action';
 import * as reducers from '../../../../store/reducers';
-import { AlertModalComponent } from '../../../parts/alert-modal/alert-modal.component';
 
 @Component({
     selector: 'app-purchase-confirm',
@@ -25,8 +25,9 @@ export class PurchaseConfirmComponent implements OnInit {
     constructor(
         private store: Store<reducers.IState>,
         private actions: Actions,
-        private modal: NgbModal,
-        private router: Router
+        private util: UtilService,
+        private router: Router,
+        private translate: TranslateService
     ) { }
 
     public ngOnInit() {
@@ -110,9 +111,9 @@ export class PurchaseConfirmComponent implements OnInit {
         const fail = this.actions.pipe(
             ofType(ActionTypes.AuthorizeCreditCardFail),
             tap(() => {
-                this.openAlert({
-                    title: 'エラー',
-                    body: 'クレジットカード情報を確認してください。'
+                this.util.openAlert({
+                    title: this.translate.instant('common.error'),
+                    body: this.translate.instant('purchase.confirm.alert.authorizeCreditCard')
                 });
                 this.router.navigate(['/purchase/input']);
             })
@@ -155,17 +156,6 @@ export class PurchaseConfirmComponent implements OnInit {
             })
         );
         race(success, fail).pipe(take(1)).subscribe();
-    }
-
-    public openAlert(args: {
-        title: string;
-        body: string;
-    }) {
-        const modalRef = this.modal.open(AlertModalComponent, {
-            centered: true
-        });
-        modalRef.componentInstance.title = args.title;
-        modalRef.componentInstance.body = args.body;
     }
 
 }

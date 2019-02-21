@@ -1,13 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { factory } from '@cinerino/api-javascript-client';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Actions, ofType } from '@ngrx/effects';
 import { select, Store } from '@ngrx/store';
+import { TranslateService } from '@ngx-translate/core';
 import * as moment from 'moment';
 import { Observable, race } from 'rxjs';
 import { take, tap } from 'rxjs/operators';
 import { getTicketPrice, IEventOrder, orderToEventOrders } from '../../../../functions';
-import { ActionTypes, OrderAuthorize } from '../../../../store/actions/order.action';
+import { UtilService } from '../../../../services';
+import { ActionTypes, Cancel, OrderAuthorize } from '../../../../store/actions/order.action';
 import * as reducers from '../../../../store/reducers';
 import { QrCodeModalComponent } from '../../../parts/qrcode-modal/qrcode-modal.component';
 
@@ -21,16 +24,21 @@ export class InquiryConfirmComponent implements OnInit {
     public moment: typeof moment = moment;
     public getTicketPrice = getTicketPrice;
     public eventOrders: IEventOrder[];
+    public error: Observable<string | null>;
+    public orderStatus: typeof factory.orderStatus = factory.orderStatus;
 
     constructor(
         private store: Store<reducers.IState>,
         private router: Router,
         private actions: Actions,
-        private modal: NgbModal
+        private modal: NgbModal,
+        private util: UtilService,
+        private translate: TranslateService
     ) { }
 
     public ngOnInit() {
         this.eventOrders = [];
+        this.error = this.store.pipe(select(reducers.getError));
         this.order = this.store.pipe(select(reducers.getOrder));
         this.order.subscribe((value) => {
             if (value.order === undefined) {
@@ -78,7 +86,59 @@ export class InquiryConfirmComponent implements OnInit {
         const fail = this.actions.pipe(
             ofType(ActionTypes.OrderAuthorizeFail),
             tap(() => {
+                this.util.openAlert({
+                    title: this.translate.instant('common.error'),
+                    body: this.translate.instant('inquiry.confirm.alert.authorize')
+                });
+            })
+        );
+        race(success, fail).pipe(take(1)).subscribe();
+    }
+
+    /**
+     * キャンセル確認
+     */
+    public cancelConfirm() {
+        this.util.openConfirm({
+            title: this.translate.instant('common.confirm'),
+            body: this.translate.instant('inquiry.confirm.confirm.cancel'),
+            cb: () => {
+                this.cancel();
+            }
+        });
+    }
+
+    /**
+     * キャンセル処理
+     */
+    public cancel() {
+        this.order.subscribe((value) => {
+            const order = value.order;
+            if (order === undefined) {
                 this.router.navigate(['/error']);
+                return;
+            }
+            this.store.dispatch(new Cancel({ orders: [order] }));
+        }).unsubscribe();
+
+        const success = this.actions.pipe(
+            ofType(ActionTypes.CancelSuccess),
+            tap(() => { })
+        );
+
+        const fail = this.actions.pipe(
+            ofType(ActionTypes.CancelFail),
+            tap(() => {
+                this.error.subscribe((error) => {
+                    this.util.openAlert({
+                        title: this.translate.instant('common.error'),
+                        body: `
+                        <p class="mb-4">${this.translate.instant('inquiry.confirm.alert.cancel')}</p>
+                            <div class="p-3 bg-light-gray select-text">
+                            <code>${error}</code>
+                        </div>`
+                    });
+                }).unsubscribe();
             })
         );
         race(success, fail).pipe(take(1)).subscribe();

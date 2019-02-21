@@ -10,14 +10,15 @@ export class CinerinoService {
     public auth: cinerino.IImplicitGrantClient;
     public event: cinerino.service.Event;
     public order: cinerino.service.Order;
-    public organization: cinerino.service.Organization;
+    public seller: cinerino.service.Seller;
     public person: cinerino.service.Person;
     public ownershipInfo: cinerino.service.person.OwnershipInfo;
     public reservation: cinerino.service.Reservation;
     public task: cinerino.service.Task;
     public payment: cinerino.service.Payment;
     public transaction: {
-        placeOrder: cinerino.service.transaction.PlaceOrder
+        placeOrder: cinerino.service.transaction.PlaceOrder,
+        returnOrder: cinerino.service.transaction.ReturnOrder
     };
 
     constructor(
@@ -32,14 +33,15 @@ export class CinerinoService {
             const option = await this.createOption();
             this.event = new cinerino.service.Event(option);
             this.order = new cinerino.service.Order(option);
-            this.organization = new cinerino.service.Organization(option);
+            this.seller = new cinerino.service.Seller(option);
             this.person = new cinerino.service.Person(option);
             this.ownershipInfo = new cinerino.service.person.OwnershipInfo(option);
             this.reservation = new cinerino.service.Reservation(option);
             this.task = new cinerino.service.Task(option);
             this.payment = new cinerino.service.Payment(option);
             this.transaction = {
-                placeOrder: new cinerino.service.txn.PlaceOrder(option)
+                placeOrder: new cinerino.service.transaction.PlaceOrder(option),
+                returnOrder: new cinerino.service.transaction.ReturnOrder(option)
             };
         } catch (err) {
             console.error(err);

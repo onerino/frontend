@@ -1,15 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Actions, ofType } from '@ngrx/effects';
 import { select, Store } from '@ngrx/store';
+import { TranslateService } from '@ngx-translate/core';
 import * as libphonenumber from 'libphonenumber-js';
 import * as moment from 'moment';
 import { Observable, race } from 'rxjs';
 import { take, tap } from 'rxjs/operators';
+import { UtilService } from '../../../services';
 import { ActionTypes, UpdateCustomer, UpdatePayment } from '../../../store/actions/user.action';
 import * as reducers from '../../../store/reducers';
-import { AlertModalComponent } from '../../parts/alert-modal/alert-modal.component';
 
 @Component({
     selector: 'app-setting',
@@ -30,8 +30,9 @@ export class SettingComponent implements OnInit {
     constructor(
         private store: Store<reducers.IState>,
         private actions: Actions,
-        private modal: NgbModal,
-        private formBuilder: FormBuilder
+        private util: UtilService,
+        private formBuilder: FormBuilder,
+        private translate: TranslateService
     ) { }
 
     public ngOnInit() {
@@ -124,9 +125,9 @@ export class SettingComponent implements OnInit {
         this.customerContactForm.controls.email.setValue((<HTMLInputElement>document.getElementById('email')).value);
         this.customerContactForm.controls.telephone.setValue((<HTMLInputElement>document.getElementById('telephone')).value);
         if (this.customerContactForm.invalid) {
-            this.openAlert({
-                title: 'エラー',
-                body: '購入者情報に誤りがあります。'
+            this.util.openAlert({
+                title: this.translate.instant('common.error'),
+                body: this.translate.instant('setting.alert.customer')
             });
             return;
         }
@@ -161,9 +162,9 @@ export class SettingComponent implements OnInit {
         this.paymentForm.controls.holderName.setValue((<HTMLInputElement>document.getElementById('holderName')).value);
 
         if (this.paymentForm.invalid) {
-            this.openAlert({
-                title: 'エラー',
-                body: '決済情報に誤りがあります。'
+            this.util.openAlert({
+                title: this.translate.instant('common.error'),
+                body: this.translate.instant('setting.alert.payment')
             });
             return;
         }
@@ -180,17 +181,6 @@ export class SettingComponent implements OnInit {
             tap(() => { })
         );
         race(success, fail).pipe(take(1)).subscribe();
-    }
-
-    public openAlert(args: {
-        title: string;
-        body: string;
-    }) {
-        const modalRef = this.modal.open(AlertModalComponent, {
-            centered: true
-        });
-        modalRef.componentInstance.title = args.title;
-        modalRef.componentInstance.body = args.body;
     }
 
 }

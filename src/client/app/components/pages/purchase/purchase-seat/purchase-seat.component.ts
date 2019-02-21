@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Actions, ofType } from '@ngrx/effects';
 import { select, Store } from '@ngrx/store';
+import { TranslateService } from '@ngx-translate/core';
 import { Observable, race } from 'rxjs';
 import { take, tap } from 'rxjs/operators';
 import { IReservationSeat, Reservation, SeatStatus } from '../../../../models';
+import { UtilService } from '../../../../services';
 import {
     ActionTypes,
     CancelSeats,
@@ -15,7 +16,6 @@ import {
     TemporaryReservation
 } from '../../../../store/actions/purchase.action';
 import * as reducers from '../../../../store/reducers';
-import { AlertModalComponent } from '../../../parts/alert-modal/alert-modal.component';
 
 @Component({
     selector: 'app-purchase-seat',
@@ -29,7 +29,8 @@ export class PurchaseSeatComponent implements OnInit {
         private store: Store<reducers.IState>,
         private actions: Actions,
         private router: Router,
-        private modal: NgbModal
+        private util: UtilService,
+        private translate: TranslateService
     ) { }
 
     public async ngOnInit() {
@@ -89,9 +90,9 @@ export class PurchaseSeatComponent implements OnInit {
             const transaction = purchase.transaction;
             const screeningEvent = purchase.screeningEvent;
             if (purchase.reservations.length === 0) {
-                this.openAlert({
-                    title: 'エラー',
-                    body: '座席が未選択です。'
+                this.util.openAlert({
+                    title: this.translate.instant('common.error'),
+                    body: this.translate.instant('purchase.seat.alert.unselected')
                 });
                 return;
             }
@@ -159,17 +160,6 @@ export class PurchaseSeatComponent implements OnInit {
             })
         );
         race(success, fail).pipe(take(1)).subscribe();
-    }
-
-    public openAlert(args: {
-        title: string;
-        body: string;
-    }) {
-        const modalRef = this.modal.open(AlertModalComponent, {
-            centered: true
-        });
-        modalRef.componentInstance.title = args.title;
-        modalRef.componentInstance.body = args.body;
     }
 
 }

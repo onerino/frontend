@@ -1,15 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Actions, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
+import { TranslateService } from '@ngx-translate/core';
 import * as libphonenumber from 'libphonenumber-js';
 import { race } from 'rxjs';
 import { take, tap } from 'rxjs/operators';
+import { UtilService } from '../../../../services';
 import { ActionTypes, Inquiry } from '../../../../store/actions/order.action';
 import * as reducers from '../../../../store/reducers';
-import { AlertModalComponent } from '../../../parts/alert-modal/alert-modal.component';
 
 @Component({
     selector: 'app-inquiry-input',
@@ -22,8 +22,9 @@ export class InquiryInputComponent implements OnInit {
         private actions: Actions,
         private formBuilder: FormBuilder,
         private store: Store<reducers.IState>,
-        private modal: NgbModal,
-        private router: Router
+        private util: UtilService,
+        private router: Router,
+        private translate: TranslateService
     ) { }
 
     public ngOnInit() {
@@ -87,24 +88,13 @@ export class InquiryInputComponent implements OnInit {
         const fail = this.actions.pipe(
             ofType(ActionTypes.InquiryFail),
             tap(() => {
-                this.openAlert({
-                    title: 'エラー',
-                    body: '入力情報に誤りがあります。'
+                this.util.openAlert({
+                    title: this.translate.instant('common.error'),
+                    body: this.translate.instant('inquiry.input.validation')
                 });
             })
         );
         race(success, fail).pipe(take(1)).subscribe();
-    }
-
-    public openAlert(args: {
-        title: string;
-        body: string;
-    }) {
-        const modalRef = this.modal.open(AlertModalComponent, {
-            centered: true
-        });
-        modalRef.componentInstance.title = args.title;
-        modalRef.componentInstance.body = args.body;
     }
 
 }

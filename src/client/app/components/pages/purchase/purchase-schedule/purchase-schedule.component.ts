@@ -209,14 +209,7 @@ export class PurchaseScheduleComponent implements OnInit, OnDestroy {
             ofType(masterAction.ActionTypes.GetScheduleSuccess),
             tap(() => {
                 this.master.subscribe((master) => {
-                    let screeningEvents = master.screeningEvents;
-                    if (this.isPreSchedule) {
-                        // TODO 本来いらないはず
-                        screeningEvents = master.screeningEvents.filter((screeningEvent) => {
-                            return (moment(screeningEvent.offers.validFrom).unix() < moment().unix()
-                                && moment(screeningEvent.offers.validThrough).unix() > moment().unix());
-                        });
-                    }
+                    const screeningEvents = master.screeningEvents;
                     this.screeningFilmEvents = screeningEventsToFilmEvents({ screeningEvents });
                     this.update();
                 }).unsubscribe();

@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Actions, ofType } from '@ngrx/effects';
 import { select, Store } from '@ngrx/store';
+import { TranslateService } from '@ngx-translate/core';
 import * as libphonenumber from 'libphonenumber-js';
 import * as moment from 'moment';
 import { Observable, race } from 'rxjs';
@@ -11,9 +12,9 @@ import { take, tap } from 'rxjs/operators';
 import { environment } from '../../../../../environments/environment';
 import { getAmount } from '../../../../functions';
 import { LibphonenumberFormatPipe } from '../../../../pipes/libphonenumber-format.pipe';
+import { UtilService } from '../../../../services';
 import { ActionTypes, CreateGmoTokenObject, RegisterContact } from '../../../../store/actions/purchase.action';
 import * as reducers from '../../../../store/reducers';
-import { AlertModalComponent } from '../../../parts/alert-modal/alert-modal.component';
 import { SecurityCodeModalComponent } from '../../../parts/security-code-modal/security-code-modal.component';
 
 @Component({
@@ -38,7 +39,9 @@ export class PurchaseInputComponent implements OnInit {
         private actions: Actions,
         private router: Router,
         private modal: NgbModal,
-        private formBuilder: FormBuilder
+        private formBuilder: FormBuilder,
+        private util: UtilService,
+        private translate: TranslateService
     ) { }
 
     public ngOnInit() {
@@ -163,16 +166,16 @@ export class PurchaseInputComponent implements OnInit {
             this.paymentForm.controls.holderName.setValue((<HTMLInputElement>document.getElementById('holderName')).value);
         }
         if (this.customerContactForm.invalid) {
-            this.openAlert({
-                title: 'エラー',
-                body: '購入者情報に誤りがあります。'
+            this.util.openAlert({
+                title: this.translate.instant('common.error'),
+                body: this.translate.instant('purchase.input.alert.customer')
             });
             return;
         }
         if (this.amount > 0 && this.paymentForm.invalid) {
-            this.openAlert({
-                title: 'エラー',
-                body: '決済情報に誤りがあります。'
+            this.util.openAlert({
+                title: this.translate.instant('common.error'),
+                body: this.translate.instant('purchase.input.alert.payment')
             });
             return;
         }
@@ -249,24 +252,13 @@ export class PurchaseInputComponent implements OnInit {
         const fail = this.actions.pipe(
             ofType(ActionTypes.CreateGmoTokenObjectFail),
             tap(() => {
-                this.openAlert({
-                    title: 'エラー',
-                    body: 'クレジットカード情報を確認してください。'
+                this.util.openAlert({
+                    title: this.translate.instant('common.error'),
+                    body: this.translate.instant('purchase.input.alert.gmoToken')
                 });
             })
         );
         race(success, fail).pipe(take(1)).subscribe();
-    }
-
-    public openAlert(args: {
-        title: string;
-        body: string;
-    }) {
-        const modalRef = this.modal.open(AlertModalComponent, {
-            centered: true
-        });
-        modalRef.componentInstance.title = args.title;
-        modalRef.componentInstance.body = args.body;
     }
 
     public openSecurityCode() {

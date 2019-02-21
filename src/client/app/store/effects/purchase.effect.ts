@@ -57,9 +57,13 @@ export class PurchaseEffects {
                         availableThrough: now
                     }
                 });
+                // TODO
+                // branchCodeが重複しているため劇場名でフィルター
+                const screeningEvents =
+                    screeningEventsResult.data.filter(data => data.superEvent.location.name.ja === payload.movieTheater.name.ja);
                 const sheduleDates: string[] = [];
 
-                screeningEventsResult.data.forEach((screeningEvent) => {
+                screeningEvents.forEach((screeningEvent) => {
                     const date = moment(screeningEvent.startDate).format('YYYY-MM-DD');
                     const findResult = sheduleDates.find(sheduleDat => sheduleDat === date);
                     if (findResult === undefined) {
