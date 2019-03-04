@@ -1,3 +1,5 @@
+import { ViewType } from '../app/models';
+
 /**
  * 環境変数local
  */
@@ -15,7 +17,12 @@ export const environment = {
     WAITER_SERVER_URL: '',
 
     ANALYTICS_ID: '',
+    LIMITED_PURCHASE_COUNT: '10',
+
+    VIEW_TYPE: ViewType.Event,
 
     TRANSACTION_TIME: '30',
-    PRE_SCHEDULE_DATE: '3'
+    PRE_SCHEDULE_DATE: '3',
+
+    STORAGE_NAME: 'OYATSU-FRONTEND-STATE'
 };

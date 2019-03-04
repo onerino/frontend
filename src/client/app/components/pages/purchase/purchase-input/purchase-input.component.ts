@@ -11,6 +11,7 @@ import { Observable, race } from 'rxjs';
 import { take, tap } from 'rxjs/operators';
 import { environment } from '../../../../../environments/environment';
 import { getAmount } from '../../../../functions';
+import { ViewType } from '../../../../models';
 import { LibphonenumberFormatPipe } from '../../../../pipes/libphonenumber-format.pipe';
 import { UtilService } from '../../../../services';
 import { ActionTypes, CreateGmoTokenObject, RegisterContact } from '../../../../store/actions/purchase.action';
@@ -33,6 +34,8 @@ export class PurchaseInputComponent implements OnInit {
         month: string[];
     };
     public amount: number;
+    public environment = environment;
+    public viewType: typeof ViewType = ViewType;
 
     constructor(
         private store: Store<reducers.IState>,
@@ -227,12 +230,12 @@ export class PurchaseInputComponent implements OnInit {
      */
     private createGmoTokenObject() {
         this.purchase.subscribe((purchase) => {
-            if (purchase.movieTheater === undefined) {
+            if (purchase.seller === undefined) {
                 this.router.navigate(['/error']);
                 return;
             }
             this.store.dispatch(new CreateGmoTokenObject({
-                movieTheater: purchase.movieTheater,
+                seller: purchase.seller,
                 creditCard: {
                     cardno: this.paymentForm.controls.cardNumber.value,
                     expire: `${this.paymentForm.controls.cardExpirationYear.value}${this.paymentForm.controls.cardExpirationMonth.value}`,
