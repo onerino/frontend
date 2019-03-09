@@ -20,7 +20,7 @@ export const environment = {
 
     LIMITED_PURCHASE_COUNT: '1',
 
-    VIEW_TYPE: ViewType.Cinema,
+    VIEW_TYPE: ViewType.Event,
 
     TRANSACTION_TIME: '15',
     PRE_SCHEDULE_DATE: '3',
