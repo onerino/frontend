@@ -27,3 +27,4 @@ export const environment = {
 
     STORAGE_NAME: 'OYATSU-FRONTEND-STATE'
 };
+
