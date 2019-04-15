@@ -23,6 +23,10 @@ import {
     InquiryConfirmComponent,
     InquiryInputComponent,
     MaintenanceComponent,
+    MypageCoinComponent,
+    MypageCreditComponent,
+    MypageIndexComponent,
+    MypageProfileComponent,
     NotfoundComponent,
     OrderListComponent,
     PurchaseBaseComponent,
@@ -40,6 +44,7 @@ import {
 } from './components/pages';
 import {
     AlertModalComponent,
+    ChargeCoinModalComponent,
     ConfirmModalComponent,
     ContentsComponent,
     FooterComponent,
@@ -55,6 +60,7 @@ import {
     PurchaseInfoComponent,
     PurchaseTransactionModalComponent,
     QrCodeModalComponent,
+    RegisteredCreditCardModalComponent,
     ScreenComponent,
     SecurityCodeModalComponent,
     TransactionRemainingTimeComponent
@@ -117,7 +123,13 @@ export function HttpLoaderFactory(http: HttpClient) {
         PurchaseEventScheduleComponent,
         PurchaseRootComponent,
         PurchaseCinemaScheduleFilmComponent,
-        PurchaseEventScheduleWorkComponent
+        PurchaseEventScheduleWorkComponent,
+        MypageIndexComponent,
+        MypageProfileComponent,
+        MypageCreditComponent,
+        MypageCoinComponent,
+        ChargeCoinModalComponent,
+        RegisteredCreditCardModalComponent
     ],
     entryComponents: [
         PurchaseCinemaTicketModalComponent,
@@ -128,7 +140,9 @@ export function HttpLoaderFactory(http: HttpClient) {
         MvtkCheckModalComponent,
         PurchaseTransactionModalComponent,
         SecurityCodeModalComponent,
-        OrderDetailModalComponent
+        OrderDetailModalComponent,
+        ChargeCoinModalComponent,
+        RegisteredCreditCardModalComponent
     ],
     imports: [
         BrowserModule,

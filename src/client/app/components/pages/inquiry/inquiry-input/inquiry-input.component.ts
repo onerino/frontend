@@ -8,7 +8,7 @@ import * as libphonenumber from 'libphonenumber-js';
 import { race } from 'rxjs';
 import { take, tap } from 'rxjs/operators';
 import { UtilService } from '../../../../services';
-import { ActionTypes, Inquiry } from '../../../../store/actions/order.action';
+import { orderAction } from '../../../../store/actions';
 import * as reducers from '../../../../store/reducers';
 
 @Component({
@@ -27,10 +27,16 @@ export class InquiryInputComponent implements OnInit {
         private translate: TranslateService
     ) { }
 
+    /**
+     * 初期化
+     */
     public ngOnInit() {
         this.createInquiryForm();
     }
 
+    /**
+     * 照会フォーム作成
+     */
     private createInquiryForm() {
         const TEL_MAX_LENGTH = 11;
         const TEL_MIN_LENGTH = 9;
@@ -63,6 +69,9 @@ export class InquiryInputComponent implements OnInit {
         });
     }
 
+    /**
+     * 照会
+     */
     public onSubmit() {
         Object.keys(this.inquiryForm.controls).forEach((key) => {
             this.inquiryForm.controls[key].markAsTouched();
@@ -74,19 +83,19 @@ export class InquiryInputComponent implements OnInit {
         }
         const confirmationNumber = Number(this.inquiryForm.controls.confirmationNumber.value);
         const telephone = this.inquiryForm.controls.telephone.value;
-        this.store.dispatch(new Inquiry({
+        this.store.dispatch(new orderAction.Inquiry({
             confirmationNumber,
             customer: { telephone }
         }));
         const success = this.actions.pipe(
-            ofType(ActionTypes.InquirySuccess),
+            ofType(orderAction.ActionTypes.InquirySuccess),
             tap(() => {
                 this.router.navigate(['/inquiry/confirm']);
             })
         );
 
         const fail = this.actions.pipe(
-            ofType(ActionTypes.InquiryFail),
+            ofType(orderAction.ActionTypes.InquiryFail),
             tap(() => {
                 this.util.openAlert({
                     title: this.translate.instant('common.error'),

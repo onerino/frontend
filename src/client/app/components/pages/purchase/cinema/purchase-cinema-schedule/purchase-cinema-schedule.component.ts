@@ -4,6 +4,7 @@ import { factory } from '@cinerino/api-javascript-client';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Actions, ofType } from '@ngrx/effects';
 import { select, Store } from '@ngrx/store';
+import { TranslateService } from '@ngx-translate/core';
 import { SERVICE_UNAVAILABLE, TOO_MANY_REQUESTS } from 'http-status';
 import * as moment from 'moment';
 import { SwiperComponent, SwiperConfigInterface, SwiperDirective } from 'ngx-swiper-wrapper';
@@ -11,8 +12,8 @@ import { Observable, race } from 'rxjs';
 import { take, tap } from 'rxjs/operators';
 import { environment } from '../../../../../../environments/environment';
 import { IScreeningEventWork, screeningEventsToWorkEvents } from '../../../../../functions';
-import * as masterAction from '../../../../../store/actions/master.action';
-import * as purchaseAction from '../../../../../store/actions/purchase.action';
+import { UtilService } from '../../../../../services';
+import { masterAction, purchaseAction } from '../../../../../store/actions';
 import * as reducers from '../../../../../store/reducers';
 import { PurchaseTransactionModalComponent } from '../../../../parts';
 
@@ -39,9 +40,14 @@ export class PurchaseCinemaScheduleComponent implements OnInit, OnDestroy {
         private store: Store<reducers.IState>,
         private actions: Actions,
         private router: Router,
-        private modal: NgbModal
+        private util: UtilService,
+        private modal: NgbModal,
+        private translate: TranslateService
     ) { }
 
+    /**
+     * 初期化
+     */
     public async ngOnInit() {
         this.swiperConfig = {
             spaceBetween: 1,
@@ -67,10 +73,16 @@ export class PurchaseCinemaScheduleComponent implements OnInit, OnDestroy {
         this.getSellers();
     }
 
+    /**
+     * 破棄
+     */
     public ngOnDestroy() {
         clearTimeout(this.updateTimer);
     }
 
+    /**
+     * スケジュールの種類を変更
+     */
     public changeScheduleType() {
         this.purchase.subscribe((purchase) => {
             if (this.isPreSchedule) {
@@ -92,6 +104,9 @@ export class PurchaseCinemaScheduleComponent implements OnInit, OnDestroy {
 
     }
 
+    /**
+     * 更新
+     */
     private update() {
         if (this.updateTimer !== undefined) {
             clearTimeout(this.updateTimer);
@@ -109,32 +124,37 @@ export class PurchaseCinemaScheduleComponent implements OnInit, OnDestroy {
     }
 
     /**
-     * resize
+     * リサイズ
      */
     public resize() {
         this.directiveRef.update();
     }
 
     /**
-     * getSellers
+     * 販売者一覧取得
      */
     public getSellers() {
-        this.store.dispatch(new masterAction.GetSellers({ params: {} }));
-
+        this.store.dispatch(new masterAction.GetSellers());
         const success = this.actions.pipe(
             ofType(masterAction.ActionTypes.GetSellersSuccess),
             tap(() => {
                 this.purchase.subscribe((purchase) => {
                     this.master.subscribe((master) => {
-                        const seller = (purchase.seller === undefined)
-                            ? master.sellers[0]
-                            : purchase.seller;
+                        let seller = (purchase.seller === undefined)
+                            ? master.sellers[0] : purchase.seller;
+                        const findResult = master.sellers.find((s) => {
+                            return (purchase.external !== undefined
+                                && purchase.external.sellerId !== undefined
+                                && s.id === purchase.external.sellerId);
+                        });
+                        if (findResult !== undefined) {
+                            seller = findResult;
+                        }
                         this.selectSeller(seller);
                     }).unsubscribe();
                 }).unsubscribe();
             })
         );
-
         const fail = this.actions.pipe(
             ofType(masterAction.ActionTypes.GetSellersFail),
             tap(() => {
@@ -145,7 +165,7 @@ export class PurchaseCinemaScheduleComponent implements OnInit, OnDestroy {
     }
 
     /**
-     * selectSeller
+     * 販売者選択
      */
     public selectSeller(seller: factory.seller.IOrganization<factory.seller.IAttributes<factory.organizationType>>) {
         this.store.dispatch(new purchaseAction.SelectSeller({ seller }));
@@ -161,7 +181,7 @@ export class PurchaseCinemaScheduleComponent implements OnInit, OnDestroy {
     }
 
     /**
-     * getPreScheduleDates
+     * 先行販売情報取得
      */
     public getPreScheduleDates() {
         this.purchase.subscribe((purchase) => {
@@ -170,7 +190,14 @@ export class PurchaseCinemaScheduleComponent implements OnInit, OnDestroy {
                 return;
             }
             const seller = purchase.seller;
-            this.store.dispatch(new purchaseAction.GetPreScheduleDates({ seller }));
+            this.store.dispatch(new purchaseAction.GetPreScheduleDates({
+                superEvent: {
+                    ids:
+                        (purchase.external === undefined || purchase.external.eventId === undefined) ? [] : [purchase.external.eventId],
+                    locationBranchCodes:
+                        (seller.location === undefined || seller.location.branchCode === undefined) ? [] : [seller.location.branchCode]
+                }
+            }));
         }).unsubscribe();
 
         const success = this.actions.pipe(
@@ -191,7 +218,7 @@ export class PurchaseCinemaScheduleComponent implements OnInit, OnDestroy {
     }
 
     /**
-     * selectDate
+     * 日付選択
      */
     public selectDate(scheduleDate?: string) {
         this.purchase.subscribe((purchase) => {
@@ -204,7 +231,16 @@ export class PurchaseCinemaScheduleComponent implements OnInit, OnDestroy {
                 scheduleDate = this.scheduleDates[0];
             }
             this.store.dispatch(new purchaseAction.SelectScheduleDate({ scheduleDate }));
-            this.store.dispatch(new masterAction.GetSchedule({ seller, scheduleDate }));
+            this.store.dispatch(new masterAction.GetSchedule({
+                superEvent: {
+                    ids:
+                        (purchase.external === undefined || purchase.external.eventId === undefined) ? [] : [purchase.external.eventId],
+                    locationBranchCodes:
+                        (seller.location === undefined || seller.location.branchCode === undefined) ? [] : [seller.location.branchCode]
+                },
+                startFrom: moment(scheduleDate).toDate(),
+                startThrough: moment(scheduleDate).add(1, 'day').toDate()
+            }));
         }).unsubscribe();
 
         const success = this.actions.pipe(
@@ -228,122 +264,114 @@ export class PurchaseCinemaScheduleComponent implements OnInit, OnDestroy {
     }
 
     /**
-     * selectSchedule
+     * パフォーマンス選択
      */
     public selectSchedule(screeningEvent: factory.chevre.event.screeningEvent.IEvent) {
         if (screeningEvent.remainingAttendeeCapacity === undefined
             || screeningEvent.remainingAttendeeCapacity === 0) {
             return;
         }
+        if (screeningEvent.offers === undefined
+            || screeningEvent.offers.itemOffered.serviceOutput === undefined
+            || screeningEvent.offers.itemOffered.serviceOutput.reservedTicket === undefined
+            || screeningEvent.offers.itemOffered.serviceOutput.reservedTicket.ticketedSeat === undefined) {
+            this.util.openAlert({
+                title: this.translate.instant('common.error'),
+                body: this.translate.instant('purchase.cinema.schedule.alert.ticketedSeat')
+            });
+            return;
+        }
         this.store.dispatch(new purchaseAction.UnsettledDelete());
         this.store.dispatch(new purchaseAction.SelectSchedule({ screeningEvent }));
         this.purchase.subscribe((purchase) => {
-            this.user.subscribe((user) => {
+            this.user.subscribe(async (user) => {
                 if (purchase.seller === undefined) {
                     this.router.navigate(['/error']);
                     return;
                 }
-
-                if (user.limitedPurchaseCount === 1) {
-                    if (purchase.authorizeSeatReservations.length > 0) {
-                        this.cancelTemporaryReservations();
-                        return;
-                    }
-                }
-                if (user.limitedPurchaseCount > 1
+                if (user.purchaseCartMaxLength > 1
                     && purchase.transaction !== undefined
                     && purchase.authorizeSeatReservations.length > 0) {
                     this.openTransactionModal();
                     return;
                 }
-                this.startTransaction();
+                try {
+                    await this.cancelTemporaryReservations();
+                    await this.startTransaction();
+                    this.router.navigate(['/purchase/cinema/seat']);
+                } catch (error) {
+                    if (error === null) {
+                        throw new Error('error is null');
+                    }
+                    const errorObject = JSON.parse(error);
+                    if (errorObject.status === TOO_MANY_REQUESTS) {
+                        this.router.navigate(['/congestion']);
+                        return;
+                    }
+                    if (errorObject.status === SERVICE_UNAVAILABLE) {
+                        this.router.navigate(['/maintenance']);
+                        return;
+                    }
+                    this.router.navigate(['/error']);
+                }
             }).unsubscribe();
         }).unsubscribe();
     }
 
-    private cancelTemporaryReservations() {
-        this.purchase.subscribe((purchase) => {
-            if (purchase.seller === undefined) {
-                this.router.navigate(['/error']);
-                return;
-            }
-
-            const authorizeSeatReservations = purchase.authorizeSeatReservations;
-            this.store.dispatch(new purchaseAction.CancelTemporaryReservations({ authorizeSeatReservations }));
-        }).unsubscribe();
-
-
-        const success = this.actions.pipe(
-            ofType(purchaseAction.ActionTypes.CancelTemporaryReservationsSuccess),
-            tap(() => {
-                this.startTransaction();
-            })
-        );
-
-        const fail = this.actions.pipe(
-            ofType(purchaseAction.ActionTypes.CancelTemporaryReservationsFail),
-            tap(() => {
-                this.store.dispatch(new purchaseAction.UnsettledDelete());
-                this.startTransaction();
-            })
-        );
-        race(success, fail).pipe(take(1)).subscribe();
+    /**
+     * 仮予約削除
+     */
+    private async cancelTemporaryReservations() {
+        return new Promise((resolve, reject) => {
+            this.purchase.subscribe((purchase) => {
+                const authorizeSeatReservations = purchase.authorizeSeatReservations;
+                this.store.dispatch(new purchaseAction.CancelTemporaryReservations({ authorizeSeatReservations }));
+            }).unsubscribe();
+            const success = this.actions.pipe(
+                ofType(purchaseAction.ActionTypes.CancelTemporaryReservationsSuccess),
+                tap(() => { resolve(); })
+            );
+            const fail = this.actions.pipe(
+                ofType(purchaseAction.ActionTypes.CancelTemporaryReservationsFail),
+                tap(() => { this.error.subscribe((error) => reject(error)).unsubscribe(); })
+            );
+            race(success, fail).pipe(take(1)).subscribe();
+        });
     }
 
-    private startTransaction() {
-        this.purchase.subscribe((purchase) => {
-            if (purchase.seller === undefined) {
-                this.router.navigate(['/error']);
-                return;
-            }
-
-            this.store.dispatch(new purchaseAction.StartTransaction({
-                params: {
-                    expires: moment().add(environment.TRANSACTION_TIME, 'minutes').toDate(),
-                    seller: {
-                        typeOf: purchase.seller.typeOf,
-                        id: purchase.seller.id
-                    },
-                    object: {}
+    /**
+     * 取引開始
+     */
+    private async startTransaction() {
+        return new Promise((resolve, reject) => {
+            this.purchase.subscribe((purchase) => {
+                if (purchase.seller === undefined) {
+                    reject(null);
+                    return;
                 }
-            }));
-        }).unsubscribe();
-
-
-        const success = this.actions.pipe(
-            ofType(purchaseAction.ActionTypes.StartTransactionSuccess),
-            tap(() => {
-                this.router.navigate(['/purchase/cinema/seat']);
-            })
-        );
-
-        const fail = this.actions.pipe(
-            ofType(purchaseAction.ActionTypes.StartTransactionFail),
-            tap(() => {
-                this.error.subscribe((error) => {
-                    try {
-                        if (error === null) {
-                            throw new Error('error is null');
-                        }
-                        const errorObject = JSON.parse(error);
-                        if (errorObject.status === TOO_MANY_REQUESTS) {
-                            this.router.navigate(['/congestion']);
-                            return;
-                        }
-                        if (errorObject.status === SERVICE_UNAVAILABLE) {
-                            this.router.navigate(['/maintenance']);
-                            return;
-                        }
-                        throw new Error('error status not match');
-                    } catch (error2) {
-                        this.router.navigate(['/error']);
+                this.store.dispatch(new purchaseAction.StartTransaction({
+                    params: {
+                        expires: moment().add(environment.TRANSACTION_TIME, 'minutes').toDate(),
+                        seller: { typeOf: purchase.seller.typeOf, id: purchase.seller.id },
+                        object: {}
                     }
-                }).unsubscribe();
-            })
-        );
-        race(success, fail).pipe(take(1)).subscribe();
+                }));
+            }).unsubscribe();
+            const success = this.actions.pipe(
+                ofType(purchaseAction.ActionTypes.StartTransactionSuccess),
+                tap(() => { resolve(); })
+            );
+            const fail = this.actions.pipe(
+                ofType(purchaseAction.ActionTypes.StartTransactionFail),
+                tap(() => { this.error.subscribe((error) => reject(error)).unsubscribe(); })
+            );
+            race(success, fail).pipe(take(1)).subscribe();
+        });
     }
 
+    /**
+     * 取引重複警告
+     */
     public openTransactionModal() {
         this.purchase.subscribe((purchase) => {
             this.user.subscribe((user) => {

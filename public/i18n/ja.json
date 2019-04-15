@@ -20,8 +20,12 @@
                     "endSale": "販売終了",
                     "outsideSalesPeriod": "販売期間外"
                 },
+                "infiniteStock": "在庫管理なし",
                 "next": "次へ",
-                "prev": ""
+                "prev": "",
+                "alert": {
+                    "ticketedSeat": "劇場表示では座席管理なしのパフォーマンスを選択できません。"
+                }
             },
             "seat": {
                 "title": "座席選択",
@@ -75,6 +79,7 @@
                     "endSale": "販売終了",
                     "outsideSalesPeriod": "販売期間外"
                 },
+                "infiniteStock": "在庫管理なし",
                 "next": "次へ",
                 "prev": ""
             },
@@ -89,9 +94,9 @@
                 "alert": {
                     "unselected": "券種が未選択です。",
                     "ticketCondition": "割引券の適用条件を再度ご確認ください。",
-                    "temporaryReservation": "仮予約に失敗しました。"
+                    "temporaryReservation": "仮予約に失敗しました。",
+                    "limit": "同時購入可能数は{{value}}件までです。"
                 }
-                
             },
             "cart": {
                 "title": "購入情報",
@@ -115,6 +120,8 @@
             "securityCode": "セキュリティーコードについて",
             "next": "次へ",
             "prev": "戻る",
+            "registeredCreditCard": "登録済みクレジットカード",
+            "inputCreditCard": "クレジットカード情報入力",
             "alert": {
                 "customer": "購入者情報に誤りがあります。",
                 "payment": "決済情報に誤りがあります。",
@@ -153,7 +160,9 @@
             "read": "ご購入ありがとうございます。",
             "next": "QRコード表示",
             "prev": "戻る",
+            "print": "印刷",
             "cancel": "キャンセル",
+            "canceled": "この注文はキャンセル済みです",
             "alert": {
                 "cancel": "キャンセルに失敗しました。",
                 "authorize": "QRコード表示を表示できません。"
@@ -230,31 +239,68 @@
     "setting": {
         "title": "設定",
         "read": "設定を変更できます。",
-        "next": "",
+        "next": "設定を変更",
         "prev": "戻る",
+        "unselected": "選択してください",
+        "pos": "POS",
+        "printer": "プリンター",
+        "printerIpAddress": "プリンターIPアドレス",
+        "printerIpAddressDescription": "※スター精密 Bluetooth接続(StarwebPRNT専用ブラウザー)の場合localhost:8001を設定してください。",
+        "testPrinting": "テスト印刷",
+        "purchaseCartMaxLength": "注文に対する予約上限数",
+        "viewType": "表示",
         "success": {
             "title": "完了",
-            "read": "変更しました。" 
-        },
-        "customer": {
-            "title": "購入者情報設定",
-            "read": "購入者情報を変更してください。",
-            "next": "購入者情報を変更"
-        },
-        "base": {
-            "title": "基本設定",
-            "read": "基本設定を変更してください。",
-            "next": "基本設定を変更",
-            "limitedPurchaseCount": "注文に対する予約上限数",
-            "viewType": "表示"
+            "read": "変更しました。"
         },
         "alert": {
-            "customer": "購入者情報に誤りがあります。",
-            "payment": "決済情報に誤りがあります。",
-            "base": "基本設定に誤りがあります。"
+            "validation": "入力情報に誤りがあります。",
+            "success": "設定を保存しました。",
+            "print": "印刷に失敗しました"
+        }
+    },
+    "mypage": {
+        "index": {
+            "title": "マイページ",
+            "read": "マイページ各種設定ができます。",
+            "next": "",
+            "prev": "戻る",
+            "profile": "会員情報",
+            "credit": "クレジットカード",
+            "coin": "コイン口座"
+        },
+        "profile": {
+            "title": "会員情報",
+            "read": "会員情報の設定ができます。",
+            "next": "会員情報を変更",
+            "prev": "戻る"
+        },
+        "credit": {
+            "title": "クレジットカード情報",
+            "read": "クレジットカードの設定ができます。",
+            "notFound": "クレジットカードが登録されていません。",
+            "add": "クレジットカードを追加",
+            "remove": "クレジットカードを削除",
+            "next": "",
+            "prev": "戻る",
+            "alert": {
+                "add": "クレジットカードの追加に失敗しました",
+                "remove": "クレジットカードの削除に失敗しました"
+            },
+            "confirm": {
+                "remove": "クレジットカードを削除してよろしいですか？"
+            }
+        },
+        "coin": {
+            "title": "コイン口座",
+            "read": "コイン口座の設定ができます。",
+            "next": "コイン口座を変更",
+            "prev": "戻る",
+            "charge": "チャージ"
         }
     },
     "form": {
+        "unselected": "選択してください",
         "validation": {
             "required": "未入力です",
             "maxlength": "{{value}}文字以下で入力してください",
@@ -270,6 +316,7 @@
         "inquiry": "照会",
         "orderSearch": "注文検索",
         "settings": "設定",
+        "mypage": "マイページ",
         "logout": "ログアウト",
         "login": "ログイン",
         "confirm": {
@@ -313,6 +360,54 @@
             },
             "next": "追加して進む",
             "prev": "カートへ移動"
+        },
+        "chargeCoin": {
+            "title": "チャージ",
+            "read": "コイン口座へのチャージ金額を入力してください。",
+            "next": "チャージ確定",
+            "prev": "戻る",
+            "charge": "チャージ金額"
+        }
+    },
+    "process": {
+        "authAction": {
+            "CheckLogin": "ログインを確認しています",
+            "Logout": "ログアウトしています"
+        },
+        "masterAction": {
+            "GetSellers": "劇場情報を取得しています",
+            "GetSchedule": "スケジュールを取得しています"
+        },
+        "orderAction": {
+            "Search": "注文情報を取得しています",
+            "Cancel": "注文情報をキャンセルしています",
+            "Print": "印刷しています",
+            "Inquiry": "注文情報を照会しています",
+            "OrderAuthorize": "注文情報を承認しています"
+        },
+        "purchaseAction": {
+            "GetPreScheduleDates": "先行販売スケジュールを取得しています",
+            "StartTransaction": "取引を開始しています",
+            "GetScreen": "スクリーン情報を取得しています",
+            "GetTicketList": "券種情報を取得しています",
+            "TemporaryReservation": "仮予約しています",
+            "TemporaryReservationFreeSeat": "仮予約しています",
+            "CancelTemporaryReservations": "仮予約をキャンセルしています",
+            "RegisterCreditCard": "クレジットカード情報を登録しています",
+            "RegisterContact": "購入者情報を登録しています",
+            "AuthorizeCreditCard": "クレジットカード情報を承認しています",
+            "CreateGmoTokenObject": "GMOオブジェクトを作成しています",
+            "AuthorizeMovieTicket": "ムビチケ情報を承認しています",
+            "CheckMovieTicket": "ムビチケ情報を確認しています",
+            "Reserve": "取引を確定しています"
+        },
+        "userAction": {
+            "InitializeProfile": "プロフィールを初期化しています",
+            "InitializeCoinAccount": "コイン口座を初期化しています",
+            "UpdateProfile": "プロフィールを更新しています",
+            "GetCreditCards": "クレジットカード情報を取得しています",
+            "AddCreditCard": "クレジットカード情報を登録しています",
+            "RemoveCreditCard": "クレジットカード情報を削除しています"
         }
     },
     "common": {
@@ -363,6 +458,11 @@
         "error": "エラー",
         "confirm": "確認",
         "complete": "完了",
-        "warning": "警告"
+        "warning": "警告",
+        "balance": "残高",
+        "coin": {
+            "balance": "コイン口座残高",
+            "name": "コイン"
+        }
     }
 }

@@ -8,7 +8,7 @@ import { Observable, race } from 'rxjs';
 import { take, tap } from 'rxjs/operators';
 import { getAmount, getTicketPrice } from '../../../../functions';
 import { UtilService } from '../../../../services';
-import { ActionTypes, AuthorizeCreditCard, AuthorizeMovieTicket, Reserve } from '../../../../store/actions/purchase.action';
+import { purchaseAction } from '../../../../store/actions';
 import * as reducers from '../../../../store/reducers';
 
 @Component({
@@ -30,6 +30,9 @@ export class PurchaseConfirmComponent implements OnInit {
         private translate: TranslateService
     ) { }
 
+    /**
+     * 初期化
+     */
     public ngOnInit() {
         this.purchase = this.store.pipe(select(reducers.getPurchase));
         this.isLoading = this.store.pipe(select(reducers.getLoading));
@@ -39,6 +42,9 @@ export class PurchaseConfirmComponent implements OnInit {
         }).unsubscribe();
     }
 
+    /**
+     * 確定
+     */
     public onSubmit() {
         this.purchase.subscribe((purchase) => {
             if (purchase.pendingMovieTickets.length > 0) {
@@ -52,7 +58,7 @@ export class PurchaseConfirmComponent implements OnInit {
     }
 
     /**
-     * reserve
+     * 予約
      */
     private reserve() {
         this.purchase.subscribe((purchase) => {
@@ -61,18 +67,18 @@ export class PurchaseConfirmComponent implements OnInit {
                 return;
             }
             const transaction = purchase.transaction;
-            this.store.dispatch(new Reserve({ transaction }));
+            this.store.dispatch(new purchaseAction.Reserve({ transaction }));
         }).unsubscribe();
 
         const success = this.actions.pipe(
-            ofType(ActionTypes.ReserveSuccess),
+            ofType(purchaseAction.ActionTypes.ReserveSuccess),
             tap(() => {
                 this.router.navigate(['/purchase/complete']);
             })
         );
 
         const fail = this.actions.pipe(
-            ofType(ActionTypes.ReserveFail),
+            ofType(purchaseAction.ActionTypes.ReserveFail),
             tap(() => {
                 this.router.navigate(['/error']);
             })
@@ -81,35 +87,35 @@ export class PurchaseConfirmComponent implements OnInit {
     }
 
     /**
-     * authorizeCreditCard
+     * クレジットカード認証
      */
     private authorizeCreditCard() {
         this.purchase.subscribe((purchase) => {
             if (purchase.transaction === undefined
-                || purchase.gmoTokenObject === undefined) {
+                || purchase.creditCard === undefined) {
                 this.router.navigate(['/error']);
                 return;
             }
 
-            this.store.dispatch(new AuthorizeCreditCard({
+            this.store.dispatch(new purchaseAction.AuthorizeCreditCard({
                 transaction: purchase.transaction,
                 authorizeCreditCardPayment: purchase.authorizeCreditCardPayments[0],
                 orderCount: purchase.orderCount,
                 amount: this.amount,
                 method: '1',
-                gmoTokenObject: purchase.gmoTokenObject
+                creditCard: purchase.creditCard
             }));
         }).unsubscribe();
 
         const success = this.actions.pipe(
-            ofType(ActionTypes.AuthorizeCreditCardSuccess),
+            ofType(purchaseAction.ActionTypes.AuthorizeCreditCardSuccess),
             tap(() => {
                 this.reserve();
             })
         );
 
         const fail = this.actions.pipe(
-            ofType(ActionTypes.AuthorizeCreditCardFail),
+            ofType(purchaseAction.ActionTypes.AuthorizeCreditCardFail),
             tap(() => {
                 this.util.openAlert({
                     title: this.translate.instant('common.error'),
@@ -122,7 +128,7 @@ export class PurchaseConfirmComponent implements OnInit {
     }
 
     /**
-     * authorizeMovieTicket
+     * ムビチケ認証
      */
     private authorizeMovieTicket() {
         this.purchase.subscribe((purchase) => {
@@ -130,7 +136,7 @@ export class PurchaseConfirmComponent implements OnInit {
                 this.router.navigate(['/error']);
                 return;
             }
-            this.store.dispatch(new AuthorizeMovieTicket({
+            this.store.dispatch(new purchaseAction.AuthorizeMovieTicket({
                 transaction: purchase.transaction,
                 authorizeMovieTicketPayments: purchase.authorizeMovieTicketPayments,
                 authorizeSeatReservations: purchase.authorizeSeatReservations,
@@ -139,7 +145,7 @@ export class PurchaseConfirmComponent implements OnInit {
         }).unsubscribe();
 
         const success = this.actions.pipe(
-            ofType(ActionTypes.AuthorizeMovieTicketSuccess),
+            ofType(purchaseAction.ActionTypes.AuthorizeMovieTicketSuccess),
             tap(() => {
                 if (this.amount > 0) {
                     this.authorizeCreditCard();
@@ -150,7 +156,7 @@ export class PurchaseConfirmComponent implements OnInit {
         );
 
         const fail = this.actions.pipe(
-            ofType(ActionTypes.AuthorizeMovieTicketFail),
+            ofType(purchaseAction.ActionTypes.AuthorizeMovieTicketFail),
             tap(() => {
                 this.router.navigate(['/error']);
             })

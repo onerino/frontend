@@ -3,6 +3,7 @@
  */
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { environment } from '../environments/environment';
 import { AuthGuardService } from './canActivates';
 import { BaseComponent } from './components/pages/base/base.component';
 import { CongestionComponent } from './components/pages/congestion/congestion.component';
@@ -13,16 +14,18 @@ import { NotfoundComponent } from './components/pages/notfound/notfound.componen
 import { SettingComponent } from './components/pages/setting/setting.component';
 import * as auth from './routes/auth.route';
 import * as inquiry from './routes/inquiry.route';
+import * as mypage from './routes/mypage.route';
 import * as order from './routes/order.route';
 import * as purchase from './routes/purchase.route';
 
 const appRoutes: Routes = [
-    { path: '', redirectTo: '/purchase/root', pathMatch: 'full' },
+    { path: '', redirectTo: environment.BASE_URL, pathMatch: 'full' },
     purchase.route,
     purchase.schedule,
     auth.route,
     inquiry.route,
     order.route,
+    mypage.route,
     {
         path: '',
         component: BaseComponent,

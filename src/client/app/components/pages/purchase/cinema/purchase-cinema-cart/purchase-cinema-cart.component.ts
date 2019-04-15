@@ -9,11 +9,7 @@ import { Observable, race } from 'rxjs';
 import { take, tap } from 'rxjs/operators';
 import { getTicketPrice } from '../../../../../functions';
 import { UtilService } from '../../../../../services';
-import {
-    ActionTypes,
-    CancelTemporaryReservations,
-    UnsettledDelete
-} from '../../../../../store/actions/purchase.action';
+import { purchaseAction } from '../../../../../store/actions';
 import * as reducers from '../../../../../store/reducers';
 
 @Component({
@@ -35,13 +31,20 @@ export class PurchaseCinemaCartComponent implements OnInit {
         private translate: TranslateService
     ) { }
 
+    /**
+     * 初期化
+     */
     public ngOnInit() {
         this.purchase = this.store.pipe(select(reducers.getPurchase));
         this.user = this.store.pipe(select(reducers.getUser));
         this.isLoading = this.store.pipe(select(reducers.getLoading));
-        this.store.dispatch(new UnsettledDelete());
+        this.store.dispatch(new purchaseAction.UnsettledDelete());
     }
 
+    /**
+     * 仮予約削除
+     * @param authorizeSeatReservations
+     */
     public removeItemProcess(
         authorizeSeatReservations: factory.action.authorize.offer.seatReservation.IAction<factory.service.webAPI.Identifier>[]
     ) {
@@ -50,16 +53,16 @@ export class PurchaseCinemaCartComponent implements OnInit {
                 this.router.navigate(['/error']);
                 return;
             }
-            this.store.dispatch(new CancelTemporaryReservations({ authorizeSeatReservations }));
+            this.store.dispatch(new purchaseAction.CancelTemporaryReservations({ authorizeSeatReservations }));
         }).unsubscribe();
 
         const success = this.actions.pipe(
-            ofType(ActionTypes.CancelTemporaryReservationsSuccess),
+            ofType(purchaseAction.ActionTypes.CancelTemporaryReservationsSuccess),
             tap(() => { })
         );
 
         const fail = this.actions.pipe(
-            ofType(ActionTypes.CancelTemporaryReservationsFail),
+            ofType(purchaseAction.ActionTypes.CancelTemporaryReservationsFail),
             tap(() => {
                 this.router.navigate(['/error']);
             })
@@ -67,6 +70,10 @@ export class PurchaseCinemaCartComponent implements OnInit {
         race(success, fail).pipe(take(1)).subscribe();
     }
 
+    /**
+     * 仮予約削除確認
+     * @param authorizeSeatReservation
+     */
     public removeItem(authorizeSeatReservation: factory.action.authorize.offer.seatReservation.IAction<factory.service.webAPI.Identifier>) {
         this.util.openConfirm({
             title: this.translate.instant('common.confirm'),

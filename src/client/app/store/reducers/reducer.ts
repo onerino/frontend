@@ -1,19 +1,17 @@
 import { environment } from '../../../environments/environment';
-import { ILanguage, Reservation } from '../../models';
-import * as masterAction from '../actions/master.action';
-import * as orderAction from '../actions/order.action';
-import * as purchaseAction from '../actions/purchase.action';
-import * as userAction from '../actions/user.action';
+import { Reservation } from '../../models';
+import { masterAction, orderAction, purchaseAction, userAction } from '../actions';
 import * as masterReducer from './master.reducer';
 import * as orderReducer from './order.reducer';
 import * as purchaseReducer from './purchase.reducer';
 import * as userReducer from './user.reducer';
+
 /**
  * State
  */
 export interface IState {
     loading: boolean;
-    process: ILanguage;
+    process: string;
     error: string | null;
     purchaseData: purchaseReducer.IPurchaseState;
     userData: userReducer.IUserState;
@@ -26,7 +24,7 @@ export interface IState {
  */
 export const initialState: IState = {
     loading: false,
-    process: { ja: '', en: '' },
+    process: '',
     error: null,
     purchaseData: purchaseReducer.purchaseInitialState,
     userData: userReducer.userInitialState,
@@ -35,7 +33,7 @@ export const initialState: IState = {
 };
 
 function getInitialState(): IState {
-    const json = sessionStorage.getItem(environment.STORAGE_NAME);
+    const json = (<Storage>(<any>window)[environment.STORAGE_TYPE]).getItem(environment.STORAGE_NAME);
     if (json === undefined || json === null) {
         return initialState;
     }
@@ -80,7 +78,7 @@ export function reducer(
  * Selectors
  */
 export const getLoading = (state: IState) => state.loading;
-export const getProcess = (state: IState) => state.process;
+export const getProcess = (state: IState) => `process.${state.process}`;
 export const getError = (state: IState) => state.error;
 export const getPurchase = (state: IState) => state.purchaseData;
 export const getUser = (state: IState) => state.userData;

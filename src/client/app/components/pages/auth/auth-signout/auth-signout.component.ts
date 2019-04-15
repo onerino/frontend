@@ -1,9 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import * as orderAction from '../../../../store/actions/order.action';
-import * as purchaseAction from '../../../../store/actions/purchase.action';
-import * as user from '../../../../store/actions/user.action';
+import { orderAction, purchaseAction, userAction } from '../../../../store/actions';
 import * as reducers from '../../../../store/reducers';
 
 @Component({
@@ -18,10 +16,13 @@ export class AuthSignoutComponent implements OnInit {
         private store: Store<reducers.IState>
     ) { }
 
+    /**
+     * 初期化
+     */
     public ngOnInit() {
         this.store.dispatch(new orderAction.Delete());
         this.store.dispatch(new purchaseAction.Delete());
-        this.store.dispatch(new user.Delete());
+        this.store.dispatch(new userAction.Delete());
         this.router.navigate(['/']);
     }
 

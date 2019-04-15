@@ -37,11 +37,10 @@
             <div class="py-3">
                 <div class="row">
                     <p class="mb-2 mb-md-0 col-md-4">
-                        <i class="fas fa-ticket-alt mr-2"></i>{{ 'common.seat' | translate }} /
-                        {{ 'common.ticket' | translate }}</p>
+                        <i class="fas fa-ticket-alt mr-2"></i>{{ 'common.seat' | translate }} / {{ 'common.ticket' | translate }}</p>
                     <div class="col-md-8">
                         <div *ngFor="let acceptedOffer of authorizeSeatReservation.object.acceptedOffer" class="mb-2">
-                            <p>{{ acceptedOffer.ticketedSeat.seatNumber }}</p>
+                            <p *ngIf="acceptedOffer.itemOffered.serviceOutput.reservedTicket.ticketedSeat">{{ acceptedOffer.ticketedSeat.seatNumber }}</p>
                             <p>{{ acceptedOffer.name | changeLanguage }} / {{
                                 getTicketPrice(acceptedOffer).single | currency : 'JPY' }}</p>
                         </div>
@@ -57,11 +56,11 @@
     <div *ngIf="(purchase | async).authorizeSeatReservations.length > 0" class="buttons mx-auto">
         <button type="button" class="btn btn-primary btn-block py-3 mb-3" [disabled]="isLoading | async"
             routerLink="/purchase/input">{{ 'purchase.cinema.cart.next' | translate }}</button>
-        <button *ngIf="(user | async).limitedPurchaseCount > (purchase | async).authorizeSeatReservations.length" type="button" class="btn btn-outline-primary btn-block py-3"
-            routerLink="/purchase/root">{{ 'purchase.cinema.cart.add' | translate }}</button>
+        <button *ngIf="(user | async).purchaseCartMaxLength > (purchase | async).authorizeSeatReservations.length" type="button" class="btn btn-outline-primary btn-block py-3"
+            routerLink="/purchase/cinema/schedule">{{ 'purchase.cinema.cart.add' | translate }}</button>
     </div>
     <div *ngIf="(purchase | async).authorizeSeatReservations.length === 0" class="buttons mx-auto">
         <button type="button" class="btn btn-outline-primary btn-block py-3"
-            routerLink="/purchase/root">{{ 'purchase.cinema.cart.prev' | translate }}</button>
+            routerLink="/purchase/cinema/schedule">{{ 'purchase.cinema.cart.prev' | translate }}</button>
     </div>
 </div>

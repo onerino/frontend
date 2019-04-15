@@ -11,14 +11,11 @@ header {
 }
 
 .header {
-    height: 80px;
+    height: 60px;
 }
 
 .logo {
-    width: 200px;
-    @include media-breakpoint-down(sm) {
-        width: 40px;
-    }
+    height: 50%;
 }
 
 .menu-button {

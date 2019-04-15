@@ -7,14 +7,7 @@ import { Observable, race } from 'rxjs';
 import { take, tap } from 'rxjs/operators';
 import { IReservationSeat, Reservation, SeatStatus } from '../../../../../models';
 import { UtilService } from '../../../../../services';
-import {
-    ActionTypes,
-    CancelSeats,
-    GetScreen,
-    GetTicketList,
-    SelectSeats,
-    TemporaryReservation
-} from '../../../../../store/actions/purchase.action';
+import { purchaseAction } from '../../../../../store/actions';
 import * as reducers from '../../../../../store/reducers';
 
 @Component({
@@ -33,6 +26,9 @@ export class PurchaseCinemaSeatComponent implements OnInit {
         private translate: TranslateService
     ) { }
 
+    /**
+     * 初期化
+     */
     public async ngOnInit() {
         this.purchase = this.store.pipe(select(reducers.getPurchase));
         this.isLoading = this.store.pipe(select(reducers.getLoading));
@@ -40,7 +36,7 @@ export class PurchaseCinemaSeatComponent implements OnInit {
     }
 
     /**
-     * getScreen
+     * スクリーン情報取得
      */
     private getScreen() {
         this.purchase.subscribe((purchase) => {
@@ -49,18 +45,18 @@ export class PurchaseCinemaSeatComponent implements OnInit {
                 this.router.navigate(['/error']);
                 return;
             }
-            this.store.dispatch(new GetScreen({ screeningEvent }));
+            this.store.dispatch(new purchaseAction.GetScreen({ screeningEvent }));
         }).unsubscribe();
 
         const success = this.actions.pipe(
-            ofType(ActionTypes.GetScreenSuccess),
+            ofType(purchaseAction.ActionTypes.GetScreenSuccess),
             tap(() => {
                 this.getTickets();
             })
         );
 
         const fail = this.actions.pipe(
-            ofType(ActionTypes.GetScreenFail),
+            ofType(purchaseAction.ActionTypes.GetScreenFail),
             tap(() => {
                 this.router.navigate(['/error']);
             })
@@ -69,21 +65,21 @@ export class PurchaseCinemaSeatComponent implements OnInit {
     }
 
     /**
-     * selectSeat
+     * 座席選択
      */
     public selectSeat(data: {
         seat: IReservationSeat,
         status: SeatStatus
     }) {
         if (data.status === SeatStatus.Default) {
-            this.store.dispatch(new SelectSeats({ seats: [data.seat] }));
+            this.store.dispatch(new purchaseAction.SelectSeats({ seats: [data.seat] }));
         } else {
-            this.store.dispatch(new CancelSeats({ seats: [data.seat] }));
+            this.store.dispatch(new purchaseAction.CancelSeats({ seats: [data.seat] }));
         }
     }
 
     /**
-     * onSubmit
+     * 座席決定
      */
     public onSubmit() {
         this.purchase.subscribe((purchase) => {
@@ -110,7 +106,7 @@ export class PurchaseCinemaSeatComponent implements OnInit {
                 this.router.navigate(['/error']);
                 return;
             }
-            this.store.dispatch(new TemporaryReservation({
+            this.store.dispatch(new purchaseAction.TemporaryReservation({
                 transaction,
                 screeningEvent,
                 reservations,
@@ -118,14 +114,14 @@ export class PurchaseCinemaSeatComponent implements OnInit {
             }));
         }).unsubscribe();
         const success = this.actions.pipe(
-            ofType(ActionTypes.TemporaryReservationSuccess),
+            ofType(purchaseAction.ActionTypes.TemporaryReservationSuccess),
             tap(() => {
                 this.router.navigate(['/purchase/cinema/ticket']);
             })
         );
 
         const fail = this.actions.pipe(
-            ofType(ActionTypes.TemporaryReservationFail),
+            ofType(purchaseAction.ActionTypes.TemporaryReservationFail),
             tap(() => {
                 this.router.navigate(['/error']);
             })
@@ -134,7 +130,7 @@ export class PurchaseCinemaSeatComponent implements OnInit {
     }
 
     /**
-     * getTickets
+     * 券種情報取得
      */
     private getTickets() {
         this.purchase.subscribe((purchase) => {
@@ -145,16 +141,16 @@ export class PurchaseCinemaSeatComponent implements OnInit {
                 this.router.navigate(['/error']);
                 return;
             }
-            this.store.dispatch(new GetTicketList({ screeningEvent, seller }));
+            this.store.dispatch(new purchaseAction.GetTicketList({ screeningEvent, seller }));
         }).unsubscribe();
 
         const success = this.actions.pipe(
-            ofType(ActionTypes.GetTicketListSuccess),
+            ofType(purchaseAction.ActionTypes.GetTicketListSuccess),
             tap(() => { })
         );
 
         const fail = this.actions.pipe(
-            ofType(ActionTypes.GetTicketListFail),
+            ofType(purchaseAction.ActionTypes.GetTicketListFail),
             tap(() => {
                 this.router.navigate(['/error']);
             })

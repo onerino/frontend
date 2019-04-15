@@ -9,11 +9,7 @@ import { Observable, race } from 'rxjs';
 import { take, tap } from 'rxjs/operators';
 import { IReservationTicket, Reservation } from '../../../../../models/purchase/reservation';
 import { UtilService } from '../../../../../services';
-import {
-    ActionTypes,
-    SelectTickets,
-    TemporaryReservation
-} from '../../../../../store/actions/purchase.action';
+import { purchaseAction } from '../../../../../store/actions';
 import * as reducers from '../../../../../store/reducers';
 import { MvtkCheckModalComponent, PurchaseCinemaTicketModalComponent } from '../../../../parts';
 
@@ -35,12 +31,18 @@ export class PurchaseCinemaTicketComponent implements OnInit {
         private translate: TranslateService
     ) { }
 
+    /**
+     * 初期化
+     */
     public ngOnInit() {
         this.purchase = this.store.pipe(select(reducers.getPurchase));
         this.user = this.store.pipe(select(reducers.getUser));
         this.isLoading = this.store.pipe(select(reducers.getLoading));
     }
 
+    /**
+     * 券種決定
+     */
     public onSubmit() {
         this.purchase.subscribe((purchase) => {
             const transaction = purchase.transaction;
@@ -87,7 +89,7 @@ export class PurchaseCinemaTicketComponent implements OnInit {
                 });
                 return;
             }
-            this.store.dispatch(new TemporaryReservation({
+            this.store.dispatch(new purchaseAction.TemporaryReservation({
                 transaction,
                 screeningEvent,
                 reservations,
@@ -96,7 +98,7 @@ export class PurchaseCinemaTicketComponent implements OnInit {
         }).unsubscribe();
 
         const success = this.actions.pipe(
-            ofType(ActionTypes.TemporaryReservationSuccess),
+            ofType(purchaseAction.ActionTypes.TemporaryReservationSuccess),
             tap(() => {
                 this.purchase.subscribe((purchase) => {
                     this.user.subscribe((user) => {
@@ -105,7 +107,7 @@ export class PurchaseCinemaTicketComponent implements OnInit {
                             this.router.navigate(['/error']);
                             return;
                         }
-                        if (user.limitedPurchaseCount === 1) {
+                        if (user.purchaseCartMaxLength === 1) {
                             this.router.navigate(['/purchase/input']);
                             return;
                         }
@@ -116,7 +118,7 @@ export class PurchaseCinemaTicketComponent implements OnInit {
         );
 
         const fail = this.actions.pipe(
-            ofType(ActionTypes.TemporaryReservationFail),
+            ofType(purchaseAction.ActionTypes.TemporaryReservationFail),
             tap(() => {
                 this.router.navigate(['/error']);
             })
@@ -124,6 +126,10 @@ export class PurchaseCinemaTicketComponent implements OnInit {
         race(success, fail).pipe(take(1)).subscribe();
     }
 
+    /**
+     * 券種一覧表示
+     * @param reservation
+     */
     public openTicketList(reservation: Reservation) {
         const modalRef = this.modal.open(PurchaseCinemaTicketModalComponent, {
             centered: true
@@ -136,7 +142,7 @@ export class PurchaseCinemaTicketComponent implements OnInit {
 
             modalRef.result.then((ticket: IReservationTicket) => {
                 reservation.ticket = ticket;
-                this.store.dispatch(new SelectTickets({ reservations: [reservation] }));
+                this.store.dispatch(new purchaseAction.SelectTickets({ reservations: [reservation] }));
             }).catch(() => { });
         }).unsubscribe();
     }

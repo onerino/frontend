@@ -36,6 +36,8 @@ export enum ActionTypes {
     CancelTemporaryReservations = '[Purchase] Cancel Temporary Reservation',
     CancelTemporaryReservationsSuccess = '[Purchase] Cancel Temporary Reservation Success',
     CancelTemporaryReservationsFail = '[Purchase] Cancel Temporary Reservation Fail',
+    RegisterCreditCard = '[Purchase] Register Credit Card',
+    RemoveCreditCard = '[Purchase] Remove Credit Card',
     RegisterContact = '[Purchase] Register Contact',
     RegisterContactSuccess = '[Purchase] Register Contact Success',
     RegisterContactFail = '[Purchase] Register Contact Fail',
@@ -53,7 +55,8 @@ export enum ActionTypes {
     ReserveFail = '[Purchase] Reserve Fail',
     CreateGmoTokenObject = '[Purchase] Create Gmo Token Object',
     CreateGmoTokenObjectSuccess = '[Purchase] Create Gmo Token Object Success',
-    CreateGmoTokenObjectFail = '[Purchase] Create Gmo Token Object Fail'
+    CreateGmoTokenObjectFail = '[Purchase] Create Gmo Token Object Fail',
+    SetExternal = '[Purchase] Set External',
 }
 
 /**
@@ -94,7 +97,17 @@ export class SelectSeller implements Action {
 export class GetPreScheduleDates implements Action {
     public readonly type = ActionTypes.GetPreScheduleDates;
     constructor(public payload: {
-        seller: factory.seller.IOrganization<factory.seller.IAttributes<factory.organizationType>>;
+        superEvent: {
+            ids?: string[];
+            /**
+             * 親イベント(劇場の上映イベント)が実施される場所の識別子リスト
+             */
+            locationBranchCodes?: string[];
+            /**
+             * イベントで上演される作品識別子リスト
+             */
+            workPerformedIdentifiers?: string[];
+        };
     }) { }
 }
 
@@ -331,6 +344,27 @@ export class CancelTemporaryReservationsFail implements Action {
 }
 
 /**
+ * RegisterCreditCard
+ */
+export class RegisterCreditCard implements Action {
+    public readonly type = ActionTypes.RegisterCreditCard;
+    constructor(public payload: {
+        creditCard: factory.paymentMethod.paymentCard.creditCard.ICheckedCard
+        | factory.paymentMethod.paymentCard.creditCard.IUnauthorizedCardOfMember
+        | factory.paymentMethod.paymentCard.creditCard.IUncheckedCardRaw
+        | factory.paymentMethod.paymentCard.creditCard.IUncheckedCardTokenized;
+    }) { }
+}
+
+/**
+ * RemoveCreditCard
+ */
+export class RemoveCreditCard implements Action {
+    public readonly type = ActionTypes.RemoveCreditCard;
+    constructor(public payload?: {}) { }
+}
+
+/**
  * RegisterContact
  */
 export class RegisterContact implements Action {
@@ -368,7 +402,10 @@ export class AuthorizeCreditCard implements Action {
         orderCount: number;
         amount: number;
         method: string;
-        gmoTokenObject: IGmoTokenObject;
+        creditCard: factory.paymentMethod.paymentCard.creditCard.ICheckedCard
+        | factory.paymentMethod.paymentCard.creditCard.IUnauthorizedCardOfMember
+        | factory.paymentMethod.paymentCard.creditCard.IUncheckedCardRaw
+        | factory.paymentMethod.paymentCard.creditCard.IUncheckedCardTokenized;
     }) { }
 }
 
@@ -511,6 +548,14 @@ export class CreateGmoTokenObjectFail implements Action {
     constructor(public payload: { error: Error }) { }
 }
 
+/**
+ * SetExternal
+ */
+export class SetExternal implements Action {
+    public readonly type = ActionTypes.SetExternal;
+    constructor(public payload: { sellerId?: string; eventId?: string; }) { }
+}
+
 
 /**
  * Actions
@@ -545,6 +590,8 @@ export type Actions =
     | CancelTemporaryReservations
     | CancelTemporaryReservationsSuccess
     | CancelTemporaryReservationsFail
+    | RegisterCreditCard
+    | RemoveCreditCard
     | RegisterContact
     | RegisterContactSuccess
     | RegisterContactFail
@@ -562,4 +609,5 @@ export type Actions =
     | ReserveFail
     | CreateGmoTokenObject
     | CreateGmoTokenObjectSuccess
-    | CreateGmoTokenObjectFail;
+    | CreateGmoTokenObjectFail
+    | SetExternal;

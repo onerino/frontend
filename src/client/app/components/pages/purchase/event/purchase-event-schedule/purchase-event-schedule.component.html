@@ -2,10 +2,10 @@
     <h2 class="text-large mb-4 text-center font-weight-bold">{{ 'purchase.event.seller.title' | translate }}</h2>
     <p class="mb-4">{{ 'purchase.event.seller.read' | translate }}</p>
 
-    <div class="theaters">
-        <button *ngFor="let theater of (master | async)?.sellers" type="button" class="btn btn-block py-3 m-0"
-            (click)="selectSeller(theater)" [class.btn-primary]="(purchase | async).seller?.id === theater.id"
-            [class.btn-outline-primary]="(purchase | async).seller?.id !== theater.id">{{ theater.name | changeLanguage }}</button>
+    <div class="sellers">
+        <button *ngFor="let seller of (master | async)?.sellers" type="button" class="btn btn-block py-3 m-0"
+            (click)="selectSeller(seller)" [class.btn-primary]="(purchase | async).seller?.id === seller.id"
+            [class.btn-outline-primary]="(purchase | async).seller?.id !== seller.id">{{ seller.name | changeLanguage }}</button>
     </div>
 </div>
 
@@ -33,6 +33,6 @@
         <button type="button" class="btn btn-primary btn-block py-3 mb-3"
             (click)="onSubmit()">{{ 'purchase.event.schedule.next' | translate }}</button>
         <!-- <button type="button" class="btn btn-outline-primary btn-block py-3"
-            routerLink="/purchase/root">{{ 'purchase.event.schedule.prev' | translate }}</button> -->
+            routerLink="/purchase/event/schedule">{{ 'purchase.event.schedule.prev' | translate }}</button> -->
     </div>
 </div>
