@@ -11,7 +11,7 @@ export const environment = {
     ENTRANCE_SERVER_URL: '',
     WAITER_SERVER_URL: '',
     ANALYTICS_ID: '',
-    PURCHASE_CART_MAX_LENGTH: '1',
+    PURCHASE_CART_MAX_LENGTH: '10',
     VIEW_TYPE: ViewType.Event,
     TRANSACTION_TIME: '15',
     PRE_SCHEDULE_DATE: '3',
