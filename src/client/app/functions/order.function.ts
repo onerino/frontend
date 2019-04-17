@@ -18,7 +18,7 @@ async function drawCanvas(args: {
         seatNumber?: string;
         ticketName: string;
         price: number;
-        qrcode: string;
+        qrcode?: string;
         posName: string
     }
 }) {
@@ -144,10 +144,12 @@ async function drawCanvas(args: {
     }
 
     // QR描画
-    for (const qrCode of printData.qrCode) {
-        const qrcodeCanvas = document.createElement('canvas');
-        await qrcode.toCanvas(qrcodeCanvas, data.qrcode);
-        context.drawImage(qrcodeCanvas, qrCode.x, qrCode.y, qrCode.width, qrCode.height);
+    if (data.qrcode !== undefined) {
+        for (const qrCode of printData.qrCode) {
+            const qrcodeCanvas = document.createElement('canvas');
+            await qrcode.toCanvas(qrcodeCanvas, data.qrcode);
+            context.drawImage(qrcodeCanvas, qrCode.x, qrCode.y, qrCode.width, qrCode.height);
+        }
     }
 
     return canvas;
@@ -157,13 +159,13 @@ async function drawCanvas(args: {
  * 印刷イメージ作成
  */
 export async function createPrintCanvas(args: {
-    printData: ITicketPrintData,
+    printData: ITicketPrintData;
+    acceptedOffer: factory.order.IAcceptedOffer<factory.order.IItemOffered>;
     order: factory.order.IOrder;
-    offerIndex: number;
     pos?: factory.seller.IPOS;
+    qrcode?: string;
 }) {
-    const order = args.order;
-    const acceptedOffer = order.acceptedOffers[args.offerIndex];
+    const acceptedOffer = args.acceptedOffer;
     if (acceptedOffer.itemOffered.typeOf !== factory.chevre.reservationType.EventReservation) {
         throw new Error('reservationType is not EventReservation');
     }
@@ -177,7 +179,7 @@ export async function createPrintCanvas(args: {
             ? undefined : acceptedOffer.itemOffered.reservedTicket.ticketedSeat.seatNumber,
         ticketName: acceptedOffer.itemOffered.reservedTicket.ticketType.name.ja,
         price: getTicketPrice(acceptedOffer).single,
-        qrcode: <string>acceptedOffer.itemOffered.reservedTicket.ticketToken,
+        qrcode: args.qrcode,
         posName: (args.pos === undefined) ? '' : args.pos.name
     };
     const printData = args.printData;

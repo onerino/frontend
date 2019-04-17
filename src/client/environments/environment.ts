@@ -1,4 +1,3 @@
-import { ViewType } from '../app/models';
 
 /**
  * 環境変数dev
@@ -10,18 +9,21 @@ export const environment = {
     ENV: 'development',
     ENTRANCE_SERVER_URL: '',
     WAITER_SERVER_URL: '',
+    VIEW_TYPE: 'event',
     ANALYTICS_ID: '',
-    PURCHASE_CART_MAX_LENGTH: '10',
-    VIEW_TYPE: ViewType.Event,
-    TRANSACTION_TIME: '15',
-    PRE_SCHEDULE_DATE: '3',
     STORAGE_NAME: 'OYATSU-FRONTEND-STATE',
     STORAGE_TYPE: 'sessionStorage',
     BASE_URL: '/purchase/root',
     HEADER_MENU: true,
-    ROUTE_SCOPE: ['purchase', 'inquiry', 'order', 'mypage', 'setting', 'auth'],
-    SCHEDULE_STATUS_THRESHOLD: { value: '30', unit: '%' },
-    INQUIRY_CANCEL: true,
-    INQUIRY_QRCODE: true,
-    INQUIRY_PRINT: true
+    HEADER_MENU_SCOPE: ['purchase', 'inquiry'],
+    PURCHASE_CART_MAX_LENGTH: '10',
+    PURCHASE_TRANSACTION_TIME: '15',
+    PURCHASE_PRE_SCHEDULE_DATE: '3',
+    PURCHASE_SCHEDULE_STATUS_THRESHOLD_VALUE: '30',
+    PURCHASE_SCHEDULE_STATUS_THRESHOLD_UNIT: '%',
+    INQUIRY_CANCEL: false,
+    INQUIRY_QRCODE: false,
+    INQUIRY_PRINT: false,
+    PRINT_QR_CODE_FILTER_SUPER_EVENT_ID: ['40599yijukxxvts'],
+    PRINT_QR_CODE_TYPE: 'encryption'
 };
