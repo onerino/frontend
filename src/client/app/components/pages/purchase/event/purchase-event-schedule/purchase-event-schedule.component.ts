@@ -24,8 +24,9 @@ export class PurchaseEventScheduleComponent implements OnInit, OnDestroy {
     public error: Observable<string | null>;
     public screeningWorkEvents: IScreeningEventWork[];
     public moment: typeof moment = moment;
-    private updateTimer: any;
     public scheduleDate: string;
+    public environment = environment;
+    private updateTimer: any;
 
     constructor(
         private store: Store<reducers.IState>,
@@ -42,7 +43,9 @@ export class PurchaseEventScheduleComponent implements OnInit, OnDestroy {
         this.error = this.store.pipe(select(reducers.getError));
         this.screeningWorkEvents = [];
         if (this.scheduleDate === undefined || this.scheduleDate === '') {
-            this.scheduleDate = moment().format('YYYY-MM-DD');
+            this.scheduleDate = moment()
+                .add(environment.PURCHASE_SCHEDULE_DEFAULT_SELECTED_DATE, 'day')
+                .format('YYYY-MM-DD');
         }
         this.getSellers();
     }
@@ -122,14 +125,21 @@ export class PurchaseEventScheduleComponent implements OnInit, OnDestroy {
                 this.router.navigate(['/error']);
                 return;
             }
+            if (this.scheduleDate === '') {
+                this.scheduleDate = moment()
+                    .add(environment.PURCHASE_SCHEDULE_DEFAULT_SELECTED_DATE, 'day')
+                    .format('YYYY-MM-DD');
+            }
             const scheduleDate = this.scheduleDate;
             this.store.dispatch(new purchaseAction.SelectScheduleDate({ scheduleDate }));
             this.store.dispatch(new masterAction.GetSchedule({
                 superEvent: {
                     ids:
-                        (purchase.external === undefined || purchase.external.eventId === undefined) ? [] : [purchase.external.eventId],
+                        (purchase.external === undefined || purchase.external.superEventId === undefined)
+                            ? [] : [purchase.external.superEventId],
                     locationBranchCodes:
-                        (seller.location === undefined || seller.location.branchCode === undefined) ? [] : [seller.location.branchCode]
+                        (seller.location === undefined || seller.location.branchCode === undefined)
+                            ? [] : [seller.location.branchCode]
                 },
                 startFrom: moment(scheduleDate).toDate(),
                 startThrough: moment(scheduleDate).add(1, 'day').toDate()

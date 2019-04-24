@@ -28,7 +28,7 @@ import {
     MypageIndexComponent,
     MypageProfileComponent,
     NotfoundComponent,
-    OrderListComponent,
+    OrderSearchComponent,
     PurchaseBaseComponent,
     PurchaseCinemaCartComponent,
     PurchaseCinemaScheduleComponent,
@@ -40,6 +40,7 @@ import {
     PurchaseEventTicketComponent,
     PurchaseInputComponent,
     PurchaseRootComponent,
+    PurchaseTransactionComponent,
     SettingComponent
 } from './components/pages';
 import {
@@ -112,7 +113,7 @@ export function HttpLoaderFactory(http: HttpClient) {
         QrCodeModalComponent,
         TransactionRemainingTimeComponent,
         ExpiredComponent,
-        OrderListComponent,
+        OrderSearchComponent,
         OrderDetailModalComponent,
         ChangeLanguagePipe,
         FormatDatePipe,
@@ -131,7 +132,8 @@ export function HttpLoaderFactory(http: HttpClient) {
         MypageCreditComponent,
         MypageCoinComponent,
         ChargeCoinModalComponent,
-        RegisteredCreditCardModalComponent
+        RegisteredCreditCardModalComponent,
+        PurchaseTransactionComponent
     ],
     entryComponents: [
         PurchaseCinemaTicketModalComponent,

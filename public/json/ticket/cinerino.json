@@ -1,25 +1,26 @@
 {
-    "size": { "width": 560, "height": 780 },
+    "size": { "width": 560, "height": 800 },
     "font": "\"Hiragino Sans\", \"Hiragino Kaku Gothic ProN\", \"游ゴシック  Medium\", meiryo, sans-serif",
     "text": [
-        { "name": "theaterName", "fillStyle": "black", "font": { "weight": "bold", "size": "34px" }, "textAlign": "center", "fillText": { "x": "center", "y": 85 } },
-        { "name": "startDate", "fillStyle": "black", "font": { "weight": "normal", "size": "40px" }, "textAlign": "center", "fillText": { "x": "center", "y": 160 } },
-        { "name": "eventName", "fillStyle": "black", "font": { "weight": "bold", "size": "40px" }, "textAlign": "center", "fillText": { "x": "center", "y": 230 } },
-        { "name": "screenName", "fillStyle": "black", "font": { "weight": "bold", "size": "40px" }, "textAlign": "center", "fillText": { "x": "center", "y": 400 } },
+        { "name": "sellerNameJa", "fillStyle": "black", "font": { "weight": "bold", "size": "34px" }, "textAlign": "center", "fillText": { "x": "center", "y": 85 } },
+        { "name": "startDate", "value": "YYYY/MM/DD(ddd) HH:mm", "fillStyle": "black", "font": { "weight": "normal", "size": "40px" }, "textAlign": "center", "fillText": { "x": "center", "y": 160 } },
+        { "name": "eventNameJa", "fillStyle": "black", "font": { "weight": "bold", "size": "40px" }, "textAlign": "center", "fillText": { "x": "center", "y": 230 } },
+        { "name": "screenNameJa", "fillStyle": "black", "font": { "weight": "bold", "size": "40px" }, "textAlign": "center", "fillText": { "x": "center", "y": 390 } },
         { "name": "seatNumber", "fillStyle": "black", "font": { "weight": "bold", "size": "40px" }, "textAlign": "center", "fillText": { "x": "center", "y": 490 } },
-        { "name": "ticketName", "fillStyle": "black", "font": { "weight": "normal", "size": "40px" }, "textAlign": "left", "fillText": { "x": "left", "y": 590 } },
+        { "name": "ticketNameJa", "fillStyle": "black", "font": { "weight": "normal", "size": "40px" }, "textAlign": "left", "fillText": { "x": "left", "y": 590 }, "slice": [0, 8] },
         { "name": "price", "fillStyle": "black", "font": { "weight": "normal", "size": "40px" }, "textAlign": "right", "fillText": { "x": "right", "y": 590 } },
-        { "value": "■ 上記日時1回限り有効", "fillStyle": "black", "font": { "weight": "normal", "size": "22px" }, "textAlign": "left", "fillText": { "x": "left", "y": 640 } },
-        { "value": "■ 変更、払戻不可", "fillStyle": "black", "font": { "weight": "normal", "size": "22px" }, "textAlign": "left", "fillText": { "x": "left", "y": 670 } },
-        { "name": "confirmationNumber", "fillStyle": "black", "font": { "weight": "normal", "size": "22px" }, "textAlign": "left", "fillText": { "x": "left", "y": 720 } },
-        { "name": "posName", "fillStyle": "black", "font": { "weight": "normal", "size": "22px" }, "textAlign": "left", "fillText": { "x": "left", "y": 750 } },
-        { "name": "date", "fillStyle": "black", "font": { "weight": "normal", "size": "22px" }, "textAlign": "left", "fillText": { "x": "left", "y": 780 } }
+        { "value": "■ 変更、払戻不可", "fillStyle": "black", "font": { "weight": "normal", "size": "22px" }, "textAlign": "left", "fillText": { "x": "left", "y": 640 } },
+        { "name": "confirmationNumber", "value": "購入番号 ", "fillStyle": "black", "font": { "weight": "normal", "size": "22px" }, "textAlign": "left", "fillText": { "x": "left", "y": 670 } },
+        { "name": "orderNumber", "value": "注文番号 ", "fillStyle": "black", "font": { "weight": "normal", "size": "22px" }, "textAlign": "left", "fillText": { "x": "left", "y": 700 } },
+        { "name": "ticketNumber", "value": "ID ", "fillStyle": "black", "font": { "weight": "normal", "size": "22px" }, "textAlign": "left", "fillText": { "x": "left", "y": 730 } },
+        { "name": "posName", "value": "端末 ", "fillStyle": "black", "font": { "weight": "normal", "size": "22px" }, "textAlign": "left", "fillText": { "x": "left", "y": 760 } },
+        { "name": "date", "fillStyle": "black", "font": { "weight": "normal", "size": "22px" }, "textAlign": "left", "fillText": { "x": "left", "y": 790 } }
     ],
     "image": [
-        { "src": "/images/print/logo.svg", "width": 200, "height": 32, "x": 180, "y": 0 },
-        { "src": "/images/print/box.svg", "width": 560, "height": 210, "x": 0, "y": 320 }
+        { "src": "/images/print/cinerino/logo.svg", "width": 200, "height": 32, "x": 180, "y": 0 },
+        { "src": "/images/print/cinerino/box.svg", "width": 560, "height": 210, "x": 0, "y": 320 }
     ],
     "qrCode": [
-        { "width": 180, "height": 180, "x": 390, "y": 610 }
+        { "width": 180, "height": 180, "x": 390, "y": 630 }
     ]
 }

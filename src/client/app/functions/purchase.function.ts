@@ -1,4 +1,5 @@
 import { factory } from '@cinerino/api-javascript-client';
+import * as moment from 'moment';
 import { environment } from '../../environments/environment';
 import { IMovieTicket } from '../models';
 
@@ -395,4 +396,38 @@ export function isScheduleStatusThreshold(
     } else {
         return false;
     }
+}
+
+/**
+ * 販売判定
+ */
+export function isSales(
+    screeningEvent: factory.chevre.event.screeningEvent.IEvent,
+    status?: 'window' | 'start' | 'end'
+) {
+    const offers = screeningEvent.offers;
+    if (offers === undefined) {
+        return false;
+    }
+    let result = false;
+    const now = moment().unix();
+    const window = Number(environment.PURCHASE_SCHEDULE_STATUS_WINDOW_TIME_MINUTES);
+    switch (status) {
+        case 'window':
+            result = moment(offers.validThrough).unix() > now
+                && moment(screeningEvent.startDate).add(window).unix() < now;
+            break;
+        case 'start':
+            result = !(moment(offers.validFrom).unix() < now);
+            break;
+        case 'end':
+            result = !(moment(offers.validThrough).unix() > now);
+            break;
+        default:
+            result = (moment(offers.validFrom).unix() < now
+                && moment(offers.validThrough).unix() > now
+                && moment(screeningEvent.startDate).add(window).unix() > now);
+            break;
+    }
+    return result;
 }

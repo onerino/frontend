@@ -18,11 +18,12 @@
                     "warning": "購入",
                     "danger": "満席",
                     "endSale": "販売終了",
-                    "outsideSalesPeriod": "販売期間外"
+                    "outsideSalesPeriod": "販売期間外",
+                    "window": "窓口"
                 },
                 "infiniteStock": "在庫管理なし",
                 "next": "次へ",
-                "prev": "",
+                "prev": "戻る",
                 "alert": {
                     "ticketedSeat": "劇場表示では座席管理なしのパフォーマンスを選択できません。"
                 }
@@ -77,11 +78,12 @@
                     "warning": "購入",
                     "danger": "満席",
                     "endSale": "販売終了",
-                    "outsideSalesPeriod": "販売期間外"
+                    "outsideSalesPeriod": "販売期間外",
+                    "window": "窓口"
                 },
                 "infiniteStock": "在庫管理なし",
                 "next": "次へ",
-                "prev": ""
+                "prev": "戻る"
             },
             "ticket": {
                 "title": "券種選択",
@@ -399,7 +401,8 @@
             "CreateGmoTokenObject": "GMOオブジェクトを作成しています",
             "AuthorizeMovieTicket": "ムビチケ情報を承認しています",
             "CheckMovieTicket": "ムビチケ情報を確認しています",
-            "Reserve": "取引を確定しています"
+            "Reserve": "取引を確定しています",
+            "ConvertExternalToPurchase": "外部データから情報をしています"
         },
         "userAction": {
             "InitializeProfile": "プロフィールを初期化しています",
@@ -409,6 +412,12 @@
             "AddCreditCard": "クレジットカード情報を登録しています",
             "RemoveCreditCard": "クレジットカード情報を削除しています"
         }
+    },
+    "footer": {
+        "company": "会社概要",
+        "law": "特定商取引法に基づく表記",
+        "privacyPolicy": "プライバシーポリシー",
+        "copyright": "Copyright (c) Motionpicture co.,ltd. All rights reserved."
     },
     "common": {
         "date": {
@@ -420,6 +429,7 @@
             "second": "秒"
         },
         "confirmationNumber": "購入番号",
+        "orderNumber": "注文番号",
         "theater": "劇場",
         "screen": "スクリーン",
         "event": "作品",
@@ -443,6 +453,7 @@
         "subtitles": "字幕版",
         "orderDate": "購入日時",
         "orderStatus": "注文ステータス",
+        "qrcode": "QRコード",
         "credit": {
             "cardNumber": "カード番号",
             "cardExpiration": "カード有効期限",

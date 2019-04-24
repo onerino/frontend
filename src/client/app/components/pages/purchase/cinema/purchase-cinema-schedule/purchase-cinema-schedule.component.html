@@ -17,7 +17,7 @@
         <button *ngIf="!isPreSchedule" type="button" class="btn btn-primary btn-block py-3"
             [disabled]="isLoading | async"
             (click)="changeScheduleType()">{{ 'purchase.cinema.schedule.preSalesSchedule' | translate }}</button>
-        <button *ngIf="isPreSchedule" type="button" class="btn btn-link"
+        <button *ngIf="isPreSchedule" type="button" class="btn btn-outline-primary btn-block py-3"
             [disabled]="isLoading | async"
             (click)="changeScheduleType()">{{ 'purchase.cinema.schedule.salesSchedule' | translate }}</button>
     </div>
@@ -53,4 +53,9 @@
     <app-purchase-cinema-performance *ngFor="let screeningWorkEvent of screeningWorkEvents"
         [screeningWorkEvent]="screeningWorkEvent" (select)="selectSchedule($event)" class="mb-3">
     </app-purchase-cinema-performance>
+</div>
+
+<div class="buttons mx-auto text-center">
+    <a *ngIf="environment.PORTAL_SITE_URL" class="btn btn-link"
+        [href]="environment.PORTAL_SITE_URL">{{ 'purchase.cinema.schedule.prev' | translate }}</a>
 </div>

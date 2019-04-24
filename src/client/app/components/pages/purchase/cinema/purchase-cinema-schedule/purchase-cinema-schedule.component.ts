@@ -34,6 +34,7 @@ export class PurchaseCinemaScheduleComponent implements OnInit, OnDestroy {
     public isPreSchedule: boolean;
     public screeningWorkEvents: IScreeningEventWork[];
     public moment: typeof moment = moment;
+    public environment = environment;
     private updateTimer: any;
 
     constructor(
@@ -87,7 +88,7 @@ export class PurchaseCinemaScheduleComponent implements OnInit, OnDestroy {
         this.purchase.subscribe((purchase) => {
             if (this.isPreSchedule) {
                 this.scheduleDates = [];
-                for (let i = 0; i < 7; i++) {
+                for (let i = 0; i < Number(environment.PURCHASE_SCHEDULE_DISPLAY_LENGTH); i++) {
                     this.scheduleDates.push(moment().add(i, 'day').format('YYYY-MM-DD'));
                 }
             } else {
@@ -170,7 +171,7 @@ export class PurchaseCinemaScheduleComponent implements OnInit, OnDestroy {
     public selectSeller(seller: factory.seller.IOrganization<factory.seller.IAttributes<factory.organizationType>>) {
         this.store.dispatch(new purchaseAction.SelectSeller({ seller }));
         this.scheduleDates = [];
-        for (let i = 0; i < 7; i++) {
+        for (let i = 0; i < Number(environment.PURCHASE_SCHEDULE_DISPLAY_LENGTH); i++) {
             this.scheduleDates.push(moment().add(i, 'day').format('YYYY-MM-DD'));
         }
         this.isPreSchedule = false;
@@ -193,9 +194,11 @@ export class PurchaseCinemaScheduleComponent implements OnInit, OnDestroy {
             this.store.dispatch(new purchaseAction.GetPreScheduleDates({
                 superEvent: {
                     ids:
-                        (purchase.external === undefined || purchase.external.eventId === undefined) ? [] : [purchase.external.eventId],
+                        (purchase.external === undefined || purchase.external.superEventId === undefined)
+                            ? [] : [purchase.external.superEventId],
                     locationBranchCodes:
-                        (seller.location === undefined || seller.location.branchCode === undefined) ? [] : [seller.location.branchCode]
+                        (seller.location === undefined || seller.location.branchCode === undefined)
+                            ? [] : [seller.location.branchCode]
                 }
             }));
         }).unsubscribe();
@@ -228,15 +231,21 @@ export class PurchaseCinemaScheduleComponent implements OnInit, OnDestroy {
                 return;
             }
             if (scheduleDate === undefined || scheduleDate === '') {
-                scheduleDate = this.scheduleDates[0];
+                scheduleDate = (this.isPreSchedule)
+                    ? this.scheduleDates[0]
+                    : moment()
+                        .add(environment.PURCHASE_SCHEDULE_DEFAULT_SELECTED_DATE, 'day')
+                        .format('YYYY-MM-DD');
             }
             this.store.dispatch(new purchaseAction.SelectScheduleDate({ scheduleDate }));
             this.store.dispatch(new masterAction.GetSchedule({
                 superEvent: {
                     ids:
-                        (purchase.external === undefined || purchase.external.eventId === undefined) ? [] : [purchase.external.eventId],
+                        (purchase.external === undefined || purchase.external.superEventId === undefined)
+                            ? [] : [purchase.external.superEventId],
                     locationBranchCodes:
-                        (seller.location === undefined || seller.location.branchCode === undefined) ? [] : [seller.location.branchCode]
+                        (seller.location === undefined || seller.location.branchCode === undefined)
+                            ? [] : [seller.location.branchCode]
                 },
                 startFrom: moment(scheduleDate).toDate(),
                 startThrough: moment(scheduleDate).add(1, 'day').toDate()
