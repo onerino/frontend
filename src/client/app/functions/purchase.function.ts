@@ -137,7 +137,7 @@ export function createMovieTicketsFromAuthorizeSeatReservation(args: {
         return [];
     }
     const pendingReservations =
-        (<factory.chevre.reservation.IReservation<factory.chevre.event.screeningEvent.ITicketPriceSpecification>[]>
+        (<factory.chevre.reservation.IReservation<factory.chevre.reservationType.EventReservation>[]>
             (<any>authorizeSeatReservation.result.responseBody).object.reservations);
 
     pendingReservations.forEach((pendingReservation) => {
@@ -430,4 +430,11 @@ export function isSales(
             break;
     }
     return result;
+}
+
+export function isTicketedSeatScreeningEvent(screeningEvent: factory.chevre.event.screeningEvent.IEvent) {
+    return (screeningEvent.offers !== undefined
+        && screeningEvent.offers.itemOffered.serviceOutput !== undefined
+        && screeningEvent.offers.itemOffered.serviceOutput.reservedTicket !== undefined
+        && screeningEvent.offers.itemOffered.serviceOutput.reservedTicket.ticketedSeat !== undefined);
 }
