@@ -1,4 +1,3 @@
-
 /**
  * 環境変数local
  */
@@ -14,13 +13,14 @@ export const environment = {
     STORAGE_NAME: 'OYATSU-FRONTEND-STATE',
     STORAGE_TYPE: 'sessionStorage',
     BASE_URL: '/purchase/root',
-    LANGUAGE: ['ja', 'en'],
-    PORTAL_SITE_URL: '',
+    LANGUAGE: ['ja'],
+    PORTAL_SITE_URL: 'http://oyatsu.town',
+    DISPLAY_TICKETED_SEAT: false,
     HEADER_MENU: true,
     HEADER_MENU_SCOPE: ['purchase', 'inquiry'],
-    FOOTER_COMPANY_URL: 'https://motionpicture.jp',
-    FOOTER_LAW_URL: 'https://motionpicture.jp',
-    FOOTER_PRIVACY_POLICY_URL: 'https://motionpicture.jp',
+    FOOTER_COMPANY_URL: 'http://oyatsu.town/company',
+    FOOTER_LAW_URL: 'http://oyatsu.town',
+    FOOTER_PRIVACY_POLICY_URL: 'http://oyatsu.town/privacy',
     PURCHASE_CART_MAX_LENGTH: '99',
     PURCHASE_TRANSACTION_TIME: '30',
     PURCHASE_PRE_SCHEDULE_DATE: '3',
@@ -29,9 +29,9 @@ export const environment = {
     PURCHASE_SCHEDULE_STATUS_WINDOW_TIME_MINUTES: '-20',
     PURCHASE_SCHEDULE_STATUS_THRESHOLD_VALUE: '30',
     PURCHASE_SCHEDULE_STATUS_THRESHOLD_UNIT: '%',
+    PURCHASE_COMPLETE_MAIL_CUSTOM: true,
     INQUIRY_CANCEL: false,
     INQUIRY_QRCODE: false,
     INQUIRY_PRINT: false,
-    PRINT_QR_CODE_FILTER_SUPER_EVENT_ID: ['40599yijukxxvts'],
     PRINT_QR_CODE_TYPE: 'encryption'
 };

@@ -6,13 +6,14 @@ import * as moment from 'moment';
 import { map, mergeMap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import {
+    createCompleteMail,
     createGmoTokenObject,
     createMovieTicketsFromAuthorizeSeatReservation,
     formatTelephone,
     isTicketedSeatScreeningEvent
 } from '../../functions';
 import { IScreen } from '../../models';
-import { CinerinoService } from '../../services';
+import { CinerinoService, UtilService } from '../../services';
 import { purchaseAction } from '../actions';
 
 /**
@@ -24,7 +25,8 @@ export class PurchaseEffects {
     constructor(
         private actions: Actions,
         private cinerino: CinerinoService,
-        private http: HttpClient
+        private http: HttpClient,
+        private util: UtilService
     ) { }
 
     /**
@@ -117,8 +119,10 @@ export class PurchaseEffects {
                 });
                 const theaterCode = payload.screeningEvent.superEvent.location.branchCode;
                 const screenCode = `000${payload.screeningEvent.location.branchCode}`.slice(-3);
-                const screen = await this.http.get<IScreen>(`/json/theater/${theaterCode}/${screenCode}.json`).toPromise();
-                const setting = await this.http.get<IScreen>('/json/theater/setting.json').toPromise();
+                const screen =
+                    await this.http.get<IScreen>(`${environment.PROJECT_ID}/json/theater/${theaterCode}/${screenCode}.json`).toPromise();
+                const setting =
+                    await this.http.get<IScreen>(`${environment.PROJECT_ID}/json/theater/setting.json`).toPromise();
                 const screenData = Object.assign(setting, screen);
                 return new purchaseAction.GetScreenSuccess({ screeningEventOffers, screenData });
             } catch (error) {
@@ -476,14 +480,28 @@ export class PurchaseEffects {
         map(action => action.payload),
         mergeMap(async (payload) => {
             const transaction = payload.transaction;
+            const authorizeSeatReservations = payload.authorizeSeatReservations;
+            const seller = payload.seller;
             try {
                 await this.cinerino.getServices();
-                const result = await this.cinerino.transaction.placeOrder.confirm({
+                const params = {
                     id: transaction.id,
                     options: {
-                        sendEmailMessage: true
+                        sendEmailMessage: true,
+                        emailTemplate: <string | undefined>undefined
                     }
-                });
+                };
+                if (environment.PURCHASE_COMPLETE_MAIL_CUSTOM) {
+                    // 完了メールをカスタマイズ
+                    const url = `/${environment.PROJECT_ID}/text/purchase/mail/complete.txt`;
+                    const template = await this.util.getText<string>(url);
+                    params.options.emailTemplate = createCompleteMail({
+                        template,
+                        authorizeSeatReservations,
+                        seller
+                    });
+                }
+                const result = await this.cinerino.transaction.placeOrder.confirm(params);
                 const order = result.order;
                 return new purchaseAction.ReserveSuccess({ order });
             } catch (error) {

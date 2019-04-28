@@ -6,6 +6,7 @@ import { TranslateService } from '@ngx-translate/core';
 import * as moment from 'moment';
 import { Observable, race } from 'rxjs';
 import { take, tap } from 'rxjs/operators';
+import { environment } from '../../../../../environments/environment';
 import { getAmount, getTicketPrice } from '../../../../functions';
 import { UtilService } from '../../../../services';
 import { purchaseAction } from '../../../../store/actions';
@@ -22,6 +23,8 @@ export class PurchaseConfirmComponent implements OnInit {
     public moment: typeof moment = moment;
     public getTicketPrice = getTicketPrice;
     public amount: number;
+    public environment = environment;
+
     constructor(
         private store: Store<reducers.IState>,
         private actions: Actions,
@@ -62,12 +65,14 @@ export class PurchaseConfirmComponent implements OnInit {
      */
     private reserve() {
         this.purchase.subscribe((purchase) => {
-            if (purchase.transaction === undefined) {
+            if (purchase.transaction === undefined || purchase.seller === undefined) {
                 this.router.navigate(['/error']);
                 return;
             }
             const transaction = purchase.transaction;
-            this.store.dispatch(new purchaseAction.Reserve({ transaction }));
+            const authorizeSeatReservations = purchase.authorizeSeatReservations;
+            const seller = purchase.seller;
+            this.store.dispatch(new purchaseAction.Reserve({ transaction, authorizeSeatReservations, seller }));
         }).unsubscribe();
 
         const success = this.actions.pipe(

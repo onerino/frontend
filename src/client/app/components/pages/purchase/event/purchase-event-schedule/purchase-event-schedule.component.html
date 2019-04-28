@@ -29,6 +29,10 @@
         </app-purchase-event-performance-confirm>
     </div>
 
+    <div class="mb-4">
+        <app-purchase-terms [language]="(user | async).language" [screeningEvent]="(purchase | async).screeningEvent"></app-purchase-terms>
+    </div>
+
     <div class="buttons mx-auto text-center">
         <button type="button" class="btn btn-primary btn-block py-3 mb-3" [disabled]="screeningWorkEvents.length === 0" 
             (click)="onSubmit()">{{ 'purchase.event.schedule.next' | translate }}</button>
