@@ -50,7 +50,13 @@
               "aot": false,
               "extractLicenses": true,
               "vendorChunk": true,
-              "buildOptimizer": false
+              "buildOptimizer": false,
+              "fileReplacements": [
+                {
+                  "replace": "src/client/environments/environment.ts",
+                  "with": "src/client/environments/environment.development.ts"
+                }
+              ]
             }
           }
         },
