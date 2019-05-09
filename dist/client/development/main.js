@@ -16417,6 +16417,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _environments_environment__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./environments/environment */ "./environments/environment.ts");
 /* harmony import */ var moment_timezone__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! moment-timezone */ "../../node_modules/moment-timezone/index.js");
 /* harmony import */ var moment_timezone__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(moment_timezone__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var ngx_bootstrap_chronos__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ngx-bootstrap/chronos */ "../../node_modules/ngx-bootstrap/chronos/fesm5/ngx-bootstrap-chronos.js");
+/* harmony import */ var ngx_bootstrap_locale__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ngx-bootstrap/locale */ "../../node_modules/ngx-bootstrap/locale/fesm5/ngx-bootstrap-locale.js");
 /**
  * main
  */
@@ -16424,9 +16426,18 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+/**
+ * タイムゾーン設定
+ */
 
 moment_timezone__WEBPACK_IMPORTED_MODULE_4__["tz"].setDefault('Asia/Tokyo');
 moment_timezone__WEBPACK_IMPORTED_MODULE_4__["locale"]('ja');
+/**
+ * 言語設定
+ */
+
+
+Object(ngx_bootstrap_chronos__WEBPACK_IMPORTED_MODULE_5__["defineLocale"])('ja', ngx_bootstrap_locale__WEBPACK_IMPORTED_MODULE_6__["jaLocale"]);
 if (_environments_environment__WEBPACK_IMPORTED_MODULE_3__["environment"].production) {
     Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["enableProdMode"])();
 }
